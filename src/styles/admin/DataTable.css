@@ -1,0 +1,143 @@
+/* ========================================
+   DATA TABLE - Reusable Component
+   ======================================== */
+
+.data-table-container {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Table Header */
+.data-table thead {
+  background: #f8f9fa;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.data-table th {
+  padding: 1rem;
+  text-align: left;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.data-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.data-table th.sortable:hover {
+  background: #e9ecef;
+  color: #000000;
+}
+
+.th-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sort-icon {
+  font-size: 0.8rem;
+  color: #667eea;
+}
+
+/* Table Body */
+.data-table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+  transition: all 0.2s ease;
+}
+
+.data-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+.data-table tbody tr.clickable {
+  cursor: pointer;
+}
+
+.data-table tbody tr.clickable:hover {
+  background: #f0f0f0;
+}
+
+.data-table td {
+  padding: 1rem;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+  vertical-align: middle;
+}
+
+/* Actions Column */
+.actions-column {
+  width: 150px;
+  text-align: center;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Loading State */
+.table-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem 2rem;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+}
+
+.loading-spinner {
+  color: #666;
+  font-size: 1rem;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Empty State */
+.table-empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem 2rem;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+}
+
+.table-empty p {
+  color: #666;
+  font-size: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .data-table-container {
+    overflow-x: auto;
+  }
+  
+  .data-table {
+    min-width: 800px;
+  }
+}
+
+@media (max-width: 768px) {
+  .data-table th,
+  .data-table td {
+    padding: 0.75rem;
+    font-size: 0.85rem;
+  }
+}

@@ -1,0 +1,148 @@
+/* Charts Grid Container */
+.charts-grid-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.chart-card-box {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.6s ease-out backwards;
+}
+
+.chart-card-box:hover {
+  border-color: #000000;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.chart-full-width {
+  grid-column: 1 / -1;
+}
+
+/* Chart Header */
+.chart-card-header {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.chart-title-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.chart-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.chart-title-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+/* Chart Content */
+.chart-content {
+  margin-bottom: 1rem;
+}
+
+/* Custom Tooltip */
+.custom-tooltip {
+  background: white;
+  border: 2px solid #000000;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.tooltip-label {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 0 0 0.25rem 0;
+  font-weight: 600;
+}
+
+.tooltip-value {
+  font-size: 1.1rem;
+  color: #1a1a1a;
+  margin: 0;
+  font-weight: 700;
+}
+
+/* Chart Legend */
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 2px solid #f0f0f0;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.legend-text {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 600;
+}
+
+/* Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .charts-grid-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .chart-full-width {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .chart-card-box {
+    padding: 1rem;
+  }
+  
+  .chart-title-text {
+    font-size: 1rem;
+  }
+  
+  .chart-icon {
+    width: 36px;
+    height: 36px;
+  }
+}

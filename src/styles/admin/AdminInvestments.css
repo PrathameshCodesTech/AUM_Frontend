@@ -1,0 +1,152 @@
+/* ========================================
+   ADMIN INVESTMENTS PAGES
+   ======================================== */
+
+.admin-investments-page,
+.admin-investment-detail-page {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Investment Stats */
+.investment-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card-investment {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.stat-card-investment:hover {
+  border-color: #000000;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.stat-icon-invest {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 10px;
+  color: white;
+}
+
+.stat-content-invest {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.stat-label-invest {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value-invest {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+/* Investment Detail Page */
+.investment-date {
+  color: #666;
+  font-size: 0.95rem;
+  margin-top: 0.25rem;
+}
+
+.info-value-detail.highlight {
+  color: #667eea;
+  font-size: 1.1rem;
+}
+
+.btn-complete {
+  background: #28a745;
+  color: white;
+}
+
+.btn-complete:hover {
+  background: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.btn-cancel {
+  background: #ff9800;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background: #e68900;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+.warning-section.cancelled {
+  background: #fff8e1;
+  border: 2px solid #ff9800;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.warning-section.cancelled h4 {
+  color: #ff9800;
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+}
+
+.warning-section.cancelled p {
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .investment-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .investment-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .admin-investment-detail-page .detail-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .detail-actions {
+    flex-wrap: wrap;
+  }
+  
+  .btn-approve-large,
+  .btn-reject-large,
+  .btn-complete,
+  .btn-cancel {
+    flex: 1;
+    min-width: calc(50% - 0.5rem);
+    justify-content: center;
+  }
+}

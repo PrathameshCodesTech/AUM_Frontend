@@ -1,0 +1,232 @@
+.how-it-works-page {
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+
+.how-it-works-main {
+  padding-top: 80px;
+}
+
+/* Hero Section */
+.hero-section-how {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  padding: 5rem 2rem;
+  text-align: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section-how::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="none"/><path d="M0 0L100 100M100 0L0 100" stroke="rgba(255,255,255,0.03)" stroke-width="1"/></svg>');
+  opacity: 0.5;
+}
+
+.hero-content-how {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-content-how h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  letter-spacing: -0.5px;
+}
+
+.hero-content-how p {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  font-weight: 300;
+}
+
+/* Steps Section */
+.steps-section {
+  padding: 5rem 2rem;
+  background: white;
+}
+
+.steps-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.step-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2.5rem;
+  text-align: center;
+  border: 2px solid #e0e0e0;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.step-card:hover {
+  border-color: #1a1a1a;
+  transform: translateY(-8px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+}
+
+.step-number {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  background: #1a1a1a;
+}
+
+.step-icon {
+  margin: 2rem 0 1.5rem;
+  color: #1a1a1a;
+}
+
+.step-card h3 {
+  font-size: 1.5rem;
+  color: #1a1a1a;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.step-card p {
+  color: #666;
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+/* Benefits Section */
+.benefits-section {
+  padding: 5rem 2rem;
+  background: #f8f9fa;
+}
+
+.benefits-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.benefits-container h2 {
+  font-size: 2.5rem;
+  text-align: center;
+  color: #1a1a1a;
+  margin-bottom: 3rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+}
+
+.benefit-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  border: 2px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.benefit-card:hover {
+  border-color: #1a1a1a;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.benefit-card h4 {
+  font-size: 1.25rem;
+  color: #1a1a1a;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+}
+
+.benefit-card p {
+  color: #666;
+  line-height: 1.6;
+}
+
+/* CTA Section */
+.cta-section-how {
+  padding: 5rem 2rem;
+  background: #1a1a1a;
+  text-align: center;
+}
+
+.cta-content-how h2 {
+  font-size: 2.5rem;
+  color: white;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.cta-content-how p {
+  font-size: 1.25rem;
+  color: white;
+  opacity: 0.8;
+  margin-bottom: 2rem;
+  font-weight: 300;
+}
+
+.cta-button {
+  padding: 1rem 2.5rem;
+  background: white;
+  color: #1a1a1a;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .how-it-works-main {
+    padding-top: 60px;
+  }
+
+  .hero-content-how h1 {
+    font-size: 2rem;
+  }
+
+  .hero-content-how p {
+    font-size: 1rem;
+  }
+
+  .steps-container {
+    grid-template-columns: 1fr;
+  }
+
+  .benefits-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .benefits-container h2,
+  .cta-content-how h2 {
+    font-size: 1.75rem;
+  }
+}
