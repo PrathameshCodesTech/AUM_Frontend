@@ -15,7 +15,7 @@ const PropertyUnits = ({ propertyId, units = [], onUnitsUpdate }) => {
     bedrooms: '',
     bathrooms: '',
     price: '',
-    status: 'available'
+    status: 'available',
   });
 
   const resetForm = () => {
@@ -26,7 +26,7 @@ const PropertyUnits = ({ propertyId, units = [], onUnitsUpdate }) => {
       bedrooms: '',
       bathrooms: '',
       price: '',
-      status: 'available'
+      status: 'available',
     });
     setEditingUnit(null);
     setShowForm(false);
@@ -34,7 +34,7 @@ const PropertyUnits = ({ propertyId, units = [], onUnitsUpdate }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleEdit = (unit) => {
@@ -45,7 +45,7 @@ const PropertyUnits = ({ propertyId, units = [], onUnitsUpdate }) => {
       bedrooms: unit.bedrooms || '',
       bathrooms: unit.bathrooms || '',
       price: unit.price,
-      status: unit.status
+      status: unit.status,
     });
     setEditingUnit(unit);
     setShowForm(true);
@@ -53,17 +53,17 @@ const PropertyUnits = ({ propertyId, units = [], onUnitsUpdate }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.unit_number || !formData.area || !formData.price) {
       toast.error('Please fill in all required fields');
       return;
     }
-    
+
     setSubmitting(true);
-    
+
     try {
       let response;
-      
+
       if (editingUnit) {
         // Update existing unit
         response = await adminService.updatePropertyUnit(propertyId, editingUnit.id, formData);
@@ -71,13 +71,20 @@ const PropertyUnits = ({ propertyId, units = [], onUnitsUpdate }) => {
         // Create new unit
         response = await adminService.createPropertyUnit(propertyId, formData);
       }
-      
+
       if (response.success) {
-        toast.success(response.message);
+        toast.success(response.message || 'Unit saved');
         resetForm();
         if (onUnitsUpdate) {
           onUnitsUpdate();
         }
+      } else if (response.errors) {
+        // DRF validation-style error
+        const firstKey = Object.keys(response.errors)[0];
+        const firstMsg = response.errors[firstKey]?.[0] || 'Validation error';
+        toast.error(firstMsg);
+      } else {
+        toast.error('Failed to save unit');
       }
     } catch (error) {
       console.error('❌ Error saving unit:', error);
@@ -91,15 +98,17 @@ const PropertyUnits = ({ propertyId, units = [], onUnitsUpdate }) => {
     if (!window.confirm('Are you sure you want to delete this unit?')) {
       return;
     }
-    
+
     try {
       const response = await adminService.deletePropertyUnit(propertyId, unitId);
-      
+
       if (response.success) {
         toast.success('Unit deleted successfully');
         if (onUnitsUpdate) {
           onUnitsUpdate();
         }
+      } else {
+        toast.error(response.message || 'Failed to delete unit');
       }
     } catch (error) {
       console.error('❌ Error deleting unit:', error);
@@ -108,22 +117,23 @@ const PropertyUnits = ({ propertyId, units = [], onUnitsUpdate }) => {
   };
 
   const formatCurrency = (amount) => {
+    if (amount === null || amount === undefined || amount === '') return '-';
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
       maximumFractionDigits: 0,
-    }).format(amount);
+    }).format(Number(amount));
   };
 
   return (
     <div className="property-units">
       <div className="units-header">
         <h3>🏢 Units</h3>
-        <button 
+        <button
           className="btn-add-unit"
           onClick={() => {
             resetForm();
-            setShowForm(!showForm);
+            setShowForm((prev) => !prev);
           }}
         >
           {showForm ? 'Cancel' : '+ Add Unit'}
@@ -223,14 +233,16 @@ const PropertyUnits = ({ propertyId, units = [], onUnitsUpdate }) => {
             </div>
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="btn-submit-unit"
             disabled={submitting}
           >
-            {submitting 
-              ? 'Saving...' 
-              : (editingUnit ? 'Update Unit' : 'Create Unit')}
+            {submitting
+              ? 'Saving...'
+              : editingUnit
+              ? 'Update Unit'
+              : 'Create Unit'}
           </button>
         </form>
       )}
@@ -256,26 +268,26 @@ const PropertyUnits = ({ propertyId, units = [], onUnitsUpdate }) => {
             <tbody>
               {units.map((unit) => (
                 <tr key={unit.id}>
-                  <td><strong>{unit.unit_number}</strong></td>
+                  <td>
+                    <strong>{unit.unit_number}</strong>
+                  </td>
                   <td>{unit.floor || 'N/A'}</td>
                   <td>{unit.area} sq ft</td>
-                  <td>
-                    {unit.bedrooms ? `${unit.bedrooms}BHK` : 'N/A'}
-                  </td>
+                  <td>{unit.bedrooms ? `${unit.bedrooms}BHK` : 'N/A'}</td>
                   <td>{formatCurrency(unit.price)}</td>
                   <td>
                     <StatusBadge status={unit.status} />
                   </td>
                   <td>
                     <div className="unit-actions">
-                      <button 
+                      <button
                         className="btn-edit-unit"
                         onClick={() => handleEdit(unit)}
                         title="Edit"
                       >
                         ✏️
                       </button>
-                      <button 
+                      <button
                         className="btn-delete-unit"
                         onClick={() => handleDelete(unit.id)}
                         title="Delete"

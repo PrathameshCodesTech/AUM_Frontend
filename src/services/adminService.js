@@ -203,6 +203,11 @@ deletePropertyUnit: async (propertyId, unitId) => {
   return response.data;
 },
 
+getPropertyTypes: async () => {
+  const response = await api.get("/admin/properties/types/");
+  return response.data; // { success: true, data: [ {value, label}, ... ] }
+},
+
 
   // ========================================
 // INVESTMENT MANAGEMENT

@@ -10,44 +10,44 @@ const PropertyDocuments = ({ propertyId, documents = [], onDocumentsUpdate }) =>
     title: '',
     document_type: 'prospectus',
     is_public: false,
-    file: null
+    file: null,
   });
   const fileInputRef = useRef(null);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData(prev => ({ ...prev, file }));
+      setFormData((prev) => ({ ...prev, file }));
     }
   };
 
   const handleUpload = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.file || !formData.title) {
       toast.error('Please fill in all required fields');
       return;
     }
-    
+
     setUploading(true);
-    
+
     try {
       const uploadData = new FormData();
       uploadData.append('title', formData.title);
       uploadData.append('document_type', formData.document_type);
-      uploadData.append('is_public', formData.is_public);
+      uploadData.append('is_public', formData.is_public ? 'true' : 'false');
       uploadData.append('file', formData.file);
-      
+
       const response = await adminService.uploadPropertyDocument(propertyId, uploadData);
-      
+
       if (response.success) {
         toast.success('Document uploaded successfully');
         setShowUploadForm(false);
@@ -55,7 +55,7 @@ const PropertyDocuments = ({ propertyId, documents = [], onDocumentsUpdate }) =>
           title: '',
           document_type: 'prospectus',
           is_public: false,
-          file: null
+          file: null,
         });
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
@@ -76,10 +76,10 @@ const PropertyDocuments = ({ propertyId, documents = [], onDocumentsUpdate }) =>
     if (!window.confirm('Are you sure you want to delete this document?')) {
       return;
     }
-    
+
     try {
       const response = await adminService.deletePropertyDocument(propertyId, documentId);
-      
+
       if (response.success) {
         toast.success('Document deleted successfully');
         if (onDocumentsUpdate) {
@@ -100,7 +100,7 @@ const PropertyDocuments = ({ propertyId, documents = [], onDocumentsUpdate }) =>
       plan: '📐',
       brochure: '📘',
       agreement: '📝',
-      other: '📎'
+      other: '📎',
     };
     return icons[type] || '📎';
   };
@@ -109,7 +109,7 @@ const PropertyDocuments = ({ propertyId, documents = [], onDocumentsUpdate }) =>
     <div className="property-documents">
       <div className="documents-header">
         <h3>📁 Documents</h3>
-        <button 
+        <button
           className="btn-upload"
           onClick={() => setShowUploadForm(!showUploadForm)}
         >
@@ -175,11 +175,7 @@ const PropertyDocuments = ({ propertyId, documents = [], onDocumentsUpdate }) =>
             </label>
           </div>
 
-          <button 
-            type="submit" 
-            className="btn-submit"
-            disabled={uploading}
-          >
+          <button type="submit" className="btn-submit" disabled={uploading}>
             {uploading ? 'Uploading...' : 'Upload Document'}
           </button>
         </form>
@@ -207,16 +203,16 @@ const PropertyDocuments = ({ propertyId, documents = [], onDocumentsUpdate }) =>
                 </div>
               </div>
               <div className="document-actions">
-                <a 
-                  href={doc.file_url} 
-                  target="_blank" 
+                <a
+                  href={doc.file_url}
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="btn-view-doc"
                   title="View Document"
                 >
                   👁️
                 </a>
-                <button 
+                <button
                   className="btn-delete-doc"
                   onClick={() => handleDelete(doc.id)}
                   title="Delete"
