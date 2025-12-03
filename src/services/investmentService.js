@@ -42,6 +42,7 @@ const investmentService = {
       throw error.response?.data || { error: 'Failed to fetch investment details' };
     }
   },
+  
 };
 
 export default investmentService;

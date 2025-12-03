@@ -56,15 +56,17 @@ const propertyService = {
   },
 
   // Add this to your existing propertyService.js
-  getPropertyAnalytics: async (slug) => {
-    try {
-      const response = await api.get(`/properties/${slug}/analytics/`);
-      return response.data;
-    } catch (error) {
-      console.error('Analytics fetch error:', error);
-      throw error;
-    }
+getPropertyAnalytics: async (slug, amount = 500000) => {
+  try {
+    const response = await api.get(`/properties/${slug}/analytics/?amount=${amount}`);
+    return response.data;
+  } catch (error) {
+    console.error('Analytics fetch error:', error);
+    throw error;
   }
+},
+
+
 
 };
 

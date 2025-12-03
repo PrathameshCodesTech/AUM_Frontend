@@ -11,8 +11,8 @@ const PropertyDetail = () => {
   const { propertyId } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  
-const [property, setProperty] = useState(null);
+
+  const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -22,12 +22,21 @@ const [property, setProperty] = useState(null);
   const [showInterestModal, setShowInterestModal] = useState(false);
   const [showInvestModal, setShowInvestModal] = useState(false);  // ← ADD THIS
   const [investing, setInvesting] = useState(false);  // ← ADD THIS
+  const [expectedEarnings, setExpectedEarnings] = useState(null);
+  const [earningsAmount, setEarningsAmount] = useState(500000);
+  const [loadingEarnings, setLoadingEarnings] = useState(false);
 
   useEffect(() => {
     fetchPropertyDetail();
   }, [propertyId]);
 
-const fetchPropertyDetail = async () => {
+  useEffect(() => {
+    if (activeTab === 'earnings' && !expectedEarnings) {
+      fetchExpectedEarnings(earningsAmount);
+    }
+  }, [activeTab]);
+
+  const fetchPropertyDetail = async () => {
     setLoading(true);
     try {
       const response = await propertyService.getPropertyDetail(propertyId);
@@ -107,7 +116,7 @@ const fetchPropertyDetail = async () => {
       if (response.success) {
         toast.success(response.message);
         setShowInvestModal(false);
-        
+
         // Refresh wallet balance
         const balanceResponse = await walletService.getBalance();
         if (balanceResponse.success) {
@@ -134,7 +143,7 @@ const fetchPropertyDetail = async () => {
   const handleAmountChange = (newAmount) => {
     const amount = parseFloat(newAmount);
     if (isNaN(amount) || amount < 0) return;
-    
+
     setInvestmentAmount(newAmount);
     const units = Math.floor(amount / parseFloat(property.price_per_unit));
     setUnitsCount(units || 1);
@@ -174,11 +183,28 @@ const fetchPropertyDetail = async () => {
     );
   }
 
-// Use all_images if available (from deep=true), otherwise fallback
+  // Use all_images if available (from deep=true), otherwise fallback
   const allImages = property.all_images?.map(img => img.url) || [
     property.primary_image || property.featured_image,
     ...(property.images?.map(img => img.image_url) || [])
   ].filter(Boolean);
+
+  const fetchExpectedEarnings = async (amount) => {
+    if (!property?.slug) return;
+
+    setLoadingEarnings(true);
+    try {
+      const response = await propertyService.getPropertyAnalytics(property.slug, amount);
+      if (response.success) {
+        setExpectedEarnings(response.data.analytics.expected_earnings);
+      }
+    } catch (error) {
+      console.error('Error fetching expected earnings:', error);
+      toast.error('Failed to load expected earnings');
+    } finally {
+      setLoadingEarnings(false);
+    }
+  };
 
   return (
     <div className="property-detail-page">
@@ -186,7 +212,7 @@ const fetchPropertyDetail = async () => {
         {/* Back Button */}
         <button className="back-button" onClick={() => navigate('/properties')}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           Back to Properties
         </button>
@@ -197,17 +223,31 @@ const fetchPropertyDetail = async () => {
           <div className="property-left">
             {/* Image Gallery */}
             <div className="image-gallery">
-              <div className="main-image">
-                <img 
-                  src={allImages[selectedImageIndex] || 'https://via.placeholder.com/800x600?text=No+Image'} 
-                  alt={property.name} 
-                />
-                {property.is_featured && <span className="featured-badge">Featured</span>}
-                <span className="sale-badge">
-                  {property.is_presale ? 'Presale' : 'Public Sale'}
-                </span>
-              </div>
-              
+             <div className="main-image">
+  <img 
+    src={allImages[selectedImageIndex] || 'https://via.placeholder.com/800x600?text=No+Image'} 
+    alt={property.name} 
+  />
+  {property.is_featured && <span className="featured-badge">Featured</span>}
+  
+  <div className="property-badges">
+    <span className={`badge-property-type ${property.property_type}`}>
+      {property.property_type === 'equity' ? 'Equity' : 
+       property.property_type === 'debt_income' ? 'Debt Income' : 
+       property.property_type === 'hybrid' ? 'Hybrid' : 
+       property.property_type}
+    </span>
+    <span className={`badge-status status-${property.status}`}>
+      {property.status === 'live' ? 'Live' :
+       property.status === 'funding' ? 'Funding' :
+       property.status === 'funded' ? 'Fully Funded' :
+       property.status === 'under_construction' ? 'Under Construction' :
+       property.status === 'completed' ? 'Completed' :
+       property.status}
+    </span>
+  </div>
+</div>
+
               {allImages.length > 1 && (
                 <div className="image-thumbnails">
                   {allImages.map((img, index) => (
@@ -229,8 +269,8 @@ const fetchPropertyDetail = async () => {
                 <h1>{property.name}</h1>
                 <p className="property-location">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="currentColor" strokeWidth="2"/>
-                    <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="2"/>
+                    <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="currentColor" strokeWidth="2" />
+                    <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="2" />
                   </svg>
                   {property.locality && `${property.locality}, `}{property.city}, {property.state}
                 </p>
@@ -250,29 +290,35 @@ const fetchPropertyDetail = async () => {
 
             {/* Tabs */}
             <div className="property-tabs">
-              <button 
+              <button
                 className={`tab ${activeTab === 'overview' ? 'active' : ''}`}
                 onClick={() => setActiveTab('overview')}
               >
                 Overview
               </button>
-              <button 
+              <button
                 className={`tab ${activeTab === 'financials' ? 'active' : ''}`}
                 onClick={() => setActiveTab('financials')}
               >
                 Financials
               </button>
-              <button 
+              <button
                 className={`tab ${activeTab === 'documents' ? 'active' : ''}`}
                 onClick={() => setActiveTab('documents')}
               >
                 Documents
               </button>
-              <button 
+              <button
                 className={`tab ${activeTab === 'location' ? 'active' : ''}`}
                 onClick={() => setActiveTab('location')}
               >
                 Location
+              </button>
+              <button
+                className={`tab ${activeTab === 'earnings' ? 'active' : ''}`}
+                onClick={() => setActiveTab('earnings')}
+              >
+                Expected Earnings
               </button>
             </div>
 
@@ -301,7 +347,7 @@ const fetchPropertyDetail = async () => {
                         {property.amenities.map((amenity, index) => (
                           <div key={index} className="amenity-item">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                              <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                             {amenity}
                           </div>
@@ -337,7 +383,7 @@ const fetchPropertyDetail = async () => {
               {activeTab === 'financials' && (
                 <div className="financials-section">
                   <h3>Financial Details</h3>
-                  
+
                   <div className="financial-grid">
                     <div className="financial-card">
                       <h4>Investment Range</h4>
@@ -351,8 +397,8 @@ const fetchPropertyDetail = async () => {
                       <h4>Target Amount</h4>
                       <p className="financial-value">{formatCurrency(property.target_amount)}</p>
                       <div className="progress-bar">
-                        <div 
-                          className="progress-fill" 
+                        <div
+                          className="progress-fill"
                           style={{ width: `${property.stats?.funding_percentage || 0}%` }}
                         />
                       </div>
@@ -410,8 +456,8 @@ const fetchPropertyDetail = async () => {
                       {(property.all_documents || property.documents).map((doc) => (
                         <div key={doc.id} className="document-item">
                           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M14 2V8H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M14 2V8H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                           <div className="document-info">
                             <h4>{doc.title}</h4>
@@ -436,8 +482,8 @@ const fetchPropertyDetail = async () => {
                   <h3>Location</h3>
                   <div className="address-box">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="currentColor" strokeWidth="2"/>
-                      <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="2"/>
+                      <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="currentColor" strokeWidth="2" />
+                      <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="2" />
                     </svg>
                     <div>
                       <p><strong>{property.name}</strong></p>
@@ -446,13 +492,138 @@ const fetchPropertyDetail = async () => {
                       <p>{property.country}</p>
                     </div>
                   </div>
-                  
+
                   {property.latitude && property.longitude && (
                     <div className="map-placeholder">
                       <p>Map integration coming soon</p>
                       <p className="coordinates">
                         Coordinates: {property.latitude}, {property.longitude}
                       </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'earnings' && (
+                <div className="earnings-section">
+                  <h3>Expected Earnings</h3>
+                  <p className="earnings-subtitle">Estimate your return on investment</p>
+
+                  {/* Calculator Input */}
+                  <div className="earnings-calculator">
+                    <label>Investment Amount</label>
+                    <div className="amount-input-wrapper">
+                      <span className="currency-symbol">₹</span>
+                      <input
+                        type="number"
+                        value={earningsAmount}
+                        onChange={(e) => setEarningsAmount(e.target.value)}
+                        min={property.minimum_investment}
+                        step="50000"
+                        placeholder="Enter amount"
+                      />
+                      <button
+                        className="calculate-btn"
+                        onClick={() => fetchExpectedEarnings(earningsAmount)}
+                        disabled={loadingEarnings}
+                      >
+                        {loadingEarnings ? 'Calculating...' : 'Calculate'}
+                      </button>
+                    </div>
+                    <p className="input-hint">
+                      Minimum: {formatCurrency(property.minimum_investment)}
+                    </p>
+                  </div>
+
+                  {/* Quick Amount Buttons */}
+                  <div className="quick-amounts">
+                    {[500000, 1000000, 2000000, 5000000].map(amount => (
+                      <button
+                        key={amount}
+                        className={`quick-amount-btn ${earningsAmount == amount ? 'active' : ''}`}
+                        onClick={() => {
+                          setEarningsAmount(amount);
+                          fetchExpectedEarnings(amount);
+                        }}
+                      >
+                        ₹{(amount / 100000).toFixed(1)}L
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Expected Earnings Table */}
+                  {loadingEarnings ? (
+                    <div className="loading-earnings">
+                      <div className="spinner"></div>
+                      <p>Calculating returns...</p>
+                    </div>
+                  ) : expectedEarnings ? (
+                    <>
+                      <div className="earnings-summary">
+                        <div className="summary-card">
+                          <span className="summary-label">Investment Amount</span>
+                          <span className="summary-value">{expectedEarnings.investment_amount_display}</span>
+                        </div>
+                        <div className="summary-card">
+                          <span className="summary-label">Total Tenure</span>
+                          <span className="summary-value">{expectedEarnings.total_tenure_years} Years</span>
+                        </div>
+                        <div className="summary-card">
+                          <span className="summary-label">Annual Return Rate</span>
+                          <span className="summary-value">{expectedEarnings.annual_return_rate}%</span>
+                        </div>
+                        <div className="summary-card highlight">
+                          <span className="summary-label">Total Net Returns</span>
+                          <span className="summary-value">
+                            ₹{(expectedEarnings.total_net / 100000).toFixed(2)}L
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="earnings-note">
+                        <p>Below are sample investment results calculated using the values entered in the Returns Calculator</p>
+                        <button className="download-report-btn">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <polyline points="7 10 12 15 17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                          Download Report
+                        </button>
+                      </div>
+
+                      <div className="earnings-table-wrapper">
+                        <table className="earnings-table">
+                          <thead>
+                            <tr>
+                              <th>Date Period</th>
+                              <th>PayOut Date</th>
+                              <th>Gross Amount</th>
+                              <th>Tax Amount</th>
+                              <th>Net Amount</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {expectedEarnings.breakdown.map((row, index) => (
+                              <tr key={index}>
+                                <td>{row.date_period}</td>
+                                <td>{row.payout_date}</td>
+                                <td>{row.gross_amount_display}</td>
+                                <td>{row.tax_amount_display}</td>
+                                <td className="net-amount">{row.net_amount_display}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <p className="disclaimer">
+                        * Returns are indicative and subject to market conditions. Tax calculations are based on current rates.
+                      </p>
+                    </>
+                  ) : (
+                    <div className="no-earnings-data">
+                      <p>Enter an amount and click Calculate to see expected earnings</p>
                     </div>
                   )}
                 </div>
@@ -504,34 +675,34 @@ const fetchPropertyDetail = async () => {
                 </div>
               </div>
 
-            <button 
-  className="express-interest-btn secondary"
-  onClick={() => setShowInterestModal(true)}
->
-  Express Interest
-</button>
+              <button
+                className="express-interest-btn secondary"
+                onClick={() => setShowInterestModal(true)}
+              >
+                Express Interest
+              </button>
 
-<button 
-  className="express-interest-btn primary"
-  onClick={handleInvestNow}
->
-  Invest Now
-</button>
+              <button
+                className="express-interest-btn primary"
+                onClick={handleInvestNow}
+              >
+                Invest Now
+              </button>
 
-<button 
-  className="view-analytics-btn"
-  onClick={() => navigate(`/analytics/${property.slug}`)}
->
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <path d="M3 3V18C3 18.5304 3.21071 19.0391 3.58579 19.4142C3.96086 19.7893 4.46957 20 5 20H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M18 9L13 14L9 10L3 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-  View Property Analytics
-</button>
+              <button
+                className="view-analytics-btn"
+                onClick={() => navigate(`/analytics/${property.slug}`)}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M3 3V18C3 18.5304 3.21071 19.0391 3.58579 19.4142C3.96086 19.7893 4.46957 20 5 20H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M18 9L13 14L9 10L3 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                View Property Analytics
+              </button>
 
-<p className="disclaimer">
-  * Returns are indicative and subject to market conditions
-</p>
+              <p className="disclaimer">
+                * Returns are indicative and subject to market conditions
+              </p>
             </div>
           </div>
         </div>
@@ -546,7 +717,7 @@ const fetchPropertyDetail = async () => {
             </button>
             <h2>Express Interest</h2>
             <p>Our team will contact you shortly to discuss investment opportunities in <strong>{property.name}</strong>.</p>
-            
+
             <div className="modal-actions">
               <button className="btn-cancel" onClick={() => setShowInterestModal(false)}>
                 Cancel
@@ -566,7 +737,7 @@ const fetchPropertyDetail = async () => {
             <button className="modal-close" onClick={() => setShowInvestModal(false)}>
               ×
             </button>
-            
+
             <h2>Invest in {property.name}</h2>
             <p className="modal-subtitle">Review your investment details</p>
 
@@ -578,8 +749,8 @@ const fetchPropertyDetail = async () => {
               {walletBalance < parseFloat(property.minimum_investment) && (
                 <div className="warning-box">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-                    <path d="M12 8V12M12 16H12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+                    <path d="M12 8V12M12 16H12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                   </svg>
                   <span>Insufficient balance. <a href="/wallet">Add funds</a></span>
                 </div>
@@ -590,7 +761,7 @@ const fetchPropertyDetail = async () => {
               <div className="input-group">
                 <label>Number of Units</label>
                 <div className="unit-selector">
-                  <button 
+                  <button
                     onClick={() => handleUnitsChange(unitsCount - 1)}
                     disabled={unitsCount <= 1}
                   >
@@ -603,7 +774,7 @@ const fetchPropertyDetail = async () => {
                     min="1"
                     max={property.available_units}
                   />
-                  <button 
+                  <button
                     onClick={() => handleUnitsChange(unitsCount + 1)}
                     disabled={unitsCount >= property.available_units}
                   >
@@ -642,15 +813,15 @@ const fetchPropertyDetail = async () => {
             </div>
 
             <div className="modal-actions">
-              <button 
-                className="btn-cancel" 
+              <button
+                className="btn-cancel"
                 onClick={() => setShowInvestModal(false)}
                 disabled={investing}
               >
                 Cancel
               </button>
-              <button 
-                className="btn-confirm" 
+              <button
+                className="btn-confirm"
                 onClick={handleInvestmentSubmit}
                 disabled={investing || walletBalance < parseFloat(investmentAmount)}
               >
