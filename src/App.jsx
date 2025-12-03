@@ -16,6 +16,7 @@ import Wishlist from './pages/Wishlist';
 import PropertyAnalytics from './pages/PropertyAnalytics';
 import PortfolioAnalytics from './pages/PortfolioAnalytics';
 import './App.css';
+import './styles/GlobalSizingAdjustments.css';
 
 function App() {
   return (

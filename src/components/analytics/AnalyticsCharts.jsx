@@ -6,7 +6,7 @@ import {
 } from 'recharts';
 import '../../styles/AnalyticsCharts.css';
 
-const AnalyticsCharts = ({ analytics }) => {
+const AnalyticsCharts = ({ analytics, chartType }) => {
   const COLORS = ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6'];
 
   const renderIcon = (iconName) => {
@@ -55,208 +55,384 @@ const AnalyticsCharts = ({ analytics }) => {
 
   const formatCurrency = (value) => `₹${Number(value).toLocaleString('en-IN')}`;
 
-  return (
-    <div className="charts-grid-container">
-      {/* Pie Chart - Funding Breakdown */}
-      <div className="chart-card-box">
-        <div className="chart-card-header">
-          <div className="chart-title-section">
-            <div className="chart-icon" style={{ background: '#10B98115', color: '#10B981' }}>
-              {renderIcon('pie')}
-            </div>
-            <h4 className="chart-title-text">Funding Sources</h4>
-          </div>
-        </div>
-        <div className="chart-content">
-          <ResponsiveContainer width="100%" height={280}>
-            <PieChart>
-              <Pie
-                data={analytics?.funding_breakdown || []}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                outerRadius={90}
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                labelLine={false}
+  // Render specific chart based on chartType prop
+  const renderChart = () => {
+    switch(chartType) {
+      case 'payout':
+        return (
+          <div className="chart-content">
+            <ResponsiveContainer width="100%" height={280}>
+              <BarChart 
+                data={analytics?.payout_history || []}
+                margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
               >
-                {analytics?.funding_breakdown?.map((entry, index) => (
-                  <Cell 
-                    key={`cell-${index}`} 
-                    fill={entry.color || COLORS[index % COLORS.length]}
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                <XAxis 
+                  dataKey="quarter" 
+                  stroke="#999" 
+                  fontSize={12}
+                  tickLine={false}
+                />
+                <YAxis 
+                  stroke="#999" 
+                  fontSize={12}
+                  tickLine={false}
+                  tickFormatter={(value) => `₹${(value / 1000).toFixed(0)}K`}
+                />
+                <Tooltip 
+                  content={<CustomTooltip formatter={formatCurrency} />}
+                />
+                <Bar 
+                  dataKey="amount" 
+                  radius={[8, 8, 0, 0]}
+                  maxBarSize={40}
+                >
+                  {analytics?.payout_history?.map((entry, index) => (
+                    <Cell 
+                      key={`bar-${index}`}
+                      fill={entry.type === 'actual' ? '#10B981' : '#F59E0B'}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+            <div className="chart-legend">
+              <div className="legend-item">
+                <span className="legend-color" style={{ background: '#10B981' }} />
+                <span className="legend-text">Actual Payout</span>
+              </div>
+              <div className="legend-item">
+                <span className="legend-color" style={{ background: '#F59E0B' }} />
+                <span className="legend-text">Projected</span>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'roi':
+        return (
+          <div className="chart-content">
+            <ResponsiveContainer width="100%" height={280}>
+              <PieChart>
+                <Pie
+                  data={analytics?.roi_breakdown || []}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={55}
+                  outerRadius={90}
+                  label={({ value }) => `${value}%`}
+                  labelLine={false}
+                >
+                  {analytics?.roi_breakdown?.map((entry, index) => (
+                    <Cell 
+                      key={`roi-${index}`} 
+                      fill={entry.color || COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip formatter={(value) => `${value}%`} />} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="chart-legend">
+              {analytics?.roi_breakdown?.map((item, index) => (
+                <div key={index} className="legend-item">
+                  <span 
+                    className="legend-color" 
+                    style={{ background: item.color || COLORS[index % COLORS.length] }}
                   />
-                ))}
-              </Pie>
-              <Tooltip content={<CustomTooltip />} />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-        <div className="chart-legend">
-          {analytics?.funding_breakdown?.map((item, index) => (
-            <div key={index} className="legend-item">
-              <span 
-                className="legend-color" 
-                style={{ background: item.color || COLORS[index % COLORS.length] }}
-              />
-              <span className="legend-text">{item.name}</span>
+                  <span className="legend-text">{item.name}</span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Line Chart - Price History */}
-      <div className="chart-card-box chart-full-width">
-        <div className="chart-card-header">
-          <div className="chart-title-section">
-            <div className="chart-icon" style={{ background: '#3B82F615', color: '#3B82F6' }}>
-              {renderIcon('line')}
-            </div>
-            <h4 className="chart-title-text">Price Growth Over Time</h4>
           </div>
-        </div>
-        <div className="chart-content">
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart 
-              data={analytics?.price_history || []}
-              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-              <XAxis 
-                dataKey="month" 
-                stroke="#999" 
-                fontSize={12}
-                tickLine={false}
-              />
-              <YAxis 
-                stroke="#999" 
-                fontSize={12}
-                tickLine={false}
-                tickFormatter={(value) => `₹${(value / 100000).toFixed(1)}L`}
-              />
-              <Tooltip 
-                content={<CustomTooltip formatter={formatCurrency} />}
-              />
-              <Line 
-                type="monotone" 
-                dataKey="price" 
-                stroke="#10B981" 
-                strokeWidth={3} 
-                dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
-                activeDot={{ r: 6, stroke: '#10B981', strokeWidth: 2 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
+        );
 
-      {/* Bar Chart - Payout History */}
-      <div className="chart-card-box">
-        <div className="chart-card-header">
-          <div className="chart-title-section">
-            <div className="chart-icon" style={{ background: '#F59E0B15', color: '#F59E0B' }}>
-              {renderIcon('bar')}
+      case 'funding':
+        return (
+          <div className="chart-content">
+            <ResponsiveContainer width="100%" height={280}>
+              <PieChart>
+                <Pie
+                  data={analytics?.funding_breakdown || []}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={90}
+                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  labelLine={false}
+                >
+                  {analytics?.funding_breakdown?.map((entry, index) => (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={entry.color || COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="chart-legend">
+              {analytics?.funding_breakdown?.map((item, index) => (
+                <div key={index} className="legend-item">
+                  <span 
+                    className="legend-color" 
+                    style={{ background: item.color || COLORS[index % COLORS.length] }}
+                  />
+                  <span className="legend-text">{item.name}</span>
+                </div>
+              ))}
             </div>
-            <h4 className="chart-title-text">Payout History</h4>
           </div>
-        </div>
-        <div className="chart-content">
-          <ResponsiveContainer width="100%" height={280}>
-            <BarChart 
-              data={analytics?.payout_history || []}
-              margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-              <XAxis 
-                dataKey="quarter" 
-                stroke="#999" 
-                fontSize={12}
-                tickLine={false}
-              />
-              <YAxis 
-                stroke="#999" 
-                fontSize={12}
-                tickLine={false}
-                tickFormatter={(value) => `₹${(value / 1000).toFixed(0)}K`}
-              />
-              <Tooltip 
-                content={<CustomTooltip formatter={formatCurrency} />}
-              />
-              <Bar 
-                dataKey="amount" 
-                radius={[8, 8, 0, 0]}
-                maxBarSize={40}
+        );
+
+      case 'priceGrowth':
+        return (
+          <div className="chart-content">
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart 
+                data={analytics?.price_history || []}
+                margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
               >
-                {analytics?.payout_history?.map((entry, index) => (
-                  <Cell 
-                    key={`bar-${index}`}
-                    fill={entry.type === 'actual' ? '#10B981' : '#F59E0B'}
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-        <div className="chart-legend">
-          <div className="legend-item">
-            <span className="legend-color" style={{ background: '#10B981' }} />
-            <span className="legend-text">Actual Payout</span>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                <XAxis 
+                  dataKey="month" 
+                  stroke="#999" 
+                  fontSize={12}
+                  tickLine={false}
+                />
+                <YAxis 
+                  stroke="#999" 
+                  fontSize={12}
+                  tickLine={false}
+                  tickFormatter={(value) => `₹${(value / 100000).toFixed(1)}L`}
+                />
+                <Tooltip 
+                  content={<CustomTooltip formatter={formatCurrency} />}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="price" 
+                  stroke="#10B981" 
+                  strokeWidth={3} 
+                  dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
+                  activeDot={{ r: 6, stroke: '#10B981', strokeWidth: 2 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
-          <div className="legend-item">
-            <span className="legend-color" style={{ background: '#F59E0B' }} />
-            <span className="legend-text">Projected</span>
-          </div>
-        </div>
-      </div>
+        );
 
-      {/* ROI Donut Chart */}
-      <div className="chart-card-box">
-        <div className="chart-card-header">
-          <div className="chart-title-section">
-            <div className="chart-icon" style={{ background: '#EF444415', color: '#EF4444' }}>
-              {renderIcon('donut')}
-            </div>
-            <h4 className="chart-title-text">ROI Breakdown</h4>
-          </div>
-        </div>
-        <div className="chart-content">
-          <ResponsiveContainer width="100%" height={280}>
-            <PieChart>
-              <Pie
-                data={analytics?.roi_breakdown || []}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                innerRadius={55}
-                outerRadius={90}
-                label={({ value }) => `${value}%`}
-                labelLine={false}
-              >
-                {analytics?.roi_breakdown?.map((entry, index) => (
-                  <Cell 
-                    key={`roi-${index}`} 
-                    fill={entry.color || COLORS[index % COLORS.length]}
-                  />
+      default:
+        // If no chartType specified, render all charts in grid (backward compatibility)
+        return (
+          <div className="charts-grid-container">
+            {/* Pie Chart - Funding Breakdown */}
+            <div className="chart-card-box">
+              <div className="chart-card-header">
+                <div className="chart-title-section">
+                  <div className="chart-icon" style={{ background: '#10B98115', color: '#10B981' }}>
+                    {renderIcon('pie')}
+                  </div>
+                  <h4 className="chart-title-text">Funding Sources</h4>
+                </div>
+              </div>
+              <div className="chart-content">
+                <ResponsiveContainer width="100%" height={280}>
+                  <PieChart>
+                    <Pie
+                      data={analytics?.funding_breakdown || []}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={90}
+                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                      labelLine={false}
+                    >
+                      {analytics?.funding_breakdown?.map((entry, index) => (
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={entry.color || COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip />} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="chart-legend">
+                {analytics?.funding_breakdown?.map((item, index) => (
+                  <div key={index} className="legend-item">
+                    <span 
+                      className="legend-color" 
+                      style={{ background: item.color || COLORS[index % COLORS.length] }}
+                    />
+                    <span className="legend-text">{item.name}</span>
+                  </div>
                 ))}
-              </Pie>
-              <Tooltip content={<CustomTooltip formatter={(value) => `${value}%`} />} />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-        <div className="chart-legend">
-          {analytics?.roi_breakdown?.map((item, index) => (
-            <div key={index} className="legend-item">
-              <span 
-                className="legend-color" 
-                style={{ background: item.color || COLORS[index % COLORS.length] }}
-              />
-              <span className="legend-text">{item.name}</span>
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+
+            {/* Line Chart - Price History */}
+            <div className="chart-card-box chart-full-width">
+              <div className="chart-card-header">
+                <div className="chart-title-section">
+                  <div className="chart-icon" style={{ background: '#3B82F615', color: '#3B82F6' }}>
+                    {renderIcon('line')}
+                  </div>
+                  <h4 className="chart-title-text">Price Growth Over Time</h4>
+                </div>
+              </div>
+              <div className="chart-content">
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart 
+                    data={analytics?.price_history || []}
+                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                    <XAxis 
+                      dataKey="month" 
+                      stroke="#999" 
+                      fontSize={12}
+                      tickLine={false}
+                    />
+                    <YAxis 
+                      stroke="#999" 
+                      fontSize={12}
+                      tickLine={false}
+                      tickFormatter={(value) => `₹${(value / 100000).toFixed(1)}L`}
+                    />
+                    <Tooltip 
+                      content={<CustomTooltip formatter={formatCurrency} />}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="price" 
+                      stroke="#10B981" 
+                      strokeWidth={3} 
+                      dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
+                      activeDot={{ r: 6, stroke: '#10B981', strokeWidth: 2 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Bar Chart - Payout History */}
+            <div className="chart-card-box">
+              <div className="chart-card-header">
+                <div className="chart-title-section">
+                  <div className="chart-icon" style={{ background: '#F59E0B15', color: '#F59E0B' }}>
+                    {renderIcon('bar')}
+                  </div>
+                  <h4 className="chart-title-text">Payout History</h4>
+                </div>
+              </div>
+              <div className="chart-content">
+                <ResponsiveContainer width="100%" height={280}>
+                  <BarChart 
+                    data={analytics?.payout_history || []}
+                    margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                    <XAxis 
+                      dataKey="quarter" 
+                      stroke="#999" 
+                      fontSize={12}
+                      tickLine={false}
+                    />
+                    <YAxis 
+                      stroke="#999" 
+                      fontSize={12}
+                      tickLine={false}
+                      tickFormatter={(value) => `₹${(value / 1000).toFixed(0)}K`}
+                    />
+                    <Tooltip 
+                      content={<CustomTooltip formatter={formatCurrency} />}
+                    />
+                    <Bar 
+                      dataKey="amount" 
+                      radius={[8, 8, 0, 0]}
+                      maxBarSize={40}
+                    >
+                      {analytics?.payout_history?.map((entry, index) => (
+                        <Cell 
+                          key={`bar-${index}`}
+                          fill={entry.type === 'actual' ? '#10B981' : '#F59E0B'}
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="chart-legend">
+                <div className="legend-item">
+                  <span className="legend-color" style={{ background: '#10B981' }} />
+                  <span className="legend-text">Actual Payout</span>
+                </div>
+                <div className="legend-item">
+                  <span className="legend-color" style={{ background: '#F59E0B' }} />
+                  <span className="legend-text">Projected</span>
+                </div>
+              </div>
+            </div>
+
+            {/* ROI Donut Chart */}
+            <div className="chart-card-box">
+              <div className="chart-card-header">
+                <div className="chart-title-section">
+                  <div className="chart-icon" style={{ background: '#EF444415', color: '#EF4444' }}>
+                    {renderIcon('donut')}
+                  </div>
+                  <h4 className="chart-title-text">ROI Breakdown</h4>
+                </div>
+              </div>
+              <div className="chart-content">
+                <ResponsiveContainer width="100%" height={280}>
+                  <PieChart>
+                    <Pie
+                      data={analytics?.roi_breakdown || []}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={55}
+                      outerRadius={90}
+                      label={({ value }) => `${value}%`}
+                      labelLine={false}
+                    >
+                      {analytics?.roi_breakdown?.map((entry, index) => (
+                        <Cell 
+                          key={`roi-${index}`} 
+                          fill={entry.color || COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip formatter={(value) => `${value}%`} />} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="chart-legend">
+                {analytics?.roi_breakdown?.map((item, index) => (
+                  <div key={index} className="legend-item">
+                    <span 
+                      className="legend-color" 
+                      style={{ background: item.color || COLORS[index % COLORS.length] }}
+                    />
+                    <span className="legend-text">{item.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+    }
+  };
+
+  return renderChart();
 };
 
 export default AnalyticsCharts;
