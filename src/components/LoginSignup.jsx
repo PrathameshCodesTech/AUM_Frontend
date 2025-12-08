@@ -40,7 +40,6 @@ const LoginSignup = () => {
   };
 
   // Send OTP
-// Send OTP
   const handleSendOTP = async () => {
     if (!validateForm()) return;
 
@@ -74,19 +73,26 @@ const LoginSignup = () => {
   };
 
   // Verify OTP
+// Verify OTP
   const handleVerifyOTP = async (otp) => {
-    try {
-      await login(mobileNo, otp);
-      toast.success('Login successful!');
-      setShowOTPModal(false);
-      
-      // Navigate to dashboard
-      navigate('/dashboard');
-    } catch (error) {
-      toast.error(error.message || error.error || 'Invalid OTP');
-      throw error; // Re-throw to prevent modal from closing
+  try {
+    await login(mobileNo, otp);  // ✅ This already handles navigation!
+    toast.success('Login successful!');
+    setShowOTPModal(false);
+    
+    // ✅ Only handle special case of pending CP application
+    const pendingApplication = localStorage.getItem('pending_cp_application');
+    if (pendingApplication) {
+      toast.info('Completing your CP application...', { duration: 3000 });
+      navigate('/cp/apply');
     }
-  };
+    // ✅ No else needed - AuthContext.login() already navigated!
+    
+  } catch (error) {
+    toast.error(error.message || error.error || 'Invalid OTP');
+    throw error;
+  }
+};
 
   // Resend OTP
   const handleResendOTP = async () => {
@@ -105,6 +111,11 @@ const LoginSignup = () => {
 
   const handleGoogleSignIn = () => {
     toast.error('Google Sign-In coming soon!');
+  };
+
+  // NEW: Handle CP Application
+  const handleBecomeCP = () => {
+    navigate('/cp/apply');
   };
 
   return (
@@ -191,6 +202,22 @@ const LoginSignup = () => {
                 </svg>
                 Sign {isLogin ? 'In' : 'Up'} With Google
               </button>
+
+              {/* NEW: Channel Partner CTA */}
+              <div className="cp-cta-section">
+                <div className="cp-divider"></div>
+                <div className="cp-info-box">
+                  <div className="cp-icon">🤝</div>
+                  <div className="cp-content">
+                    <h3>Want to Earn with AssetKart?</h3>
+                    <p>Become a Channel Partner and earn attractive commissions</p>
+                  </div>
+                </div>
+                <button className="become-cp-button" onClick={handleBecomeCP}>
+                  <span className="cp-btn-icon">💰</span>
+                  Become a Channel Partner
+                </button>
+              </div>
             </div>
             
             <div className="footer-text">

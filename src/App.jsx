@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoutes from './routes/AdminRoutes';
+import CPRoutes from './routes/CPRoutes'; // Add this import
 import Header from './components/Header';
 import Footer from './components/Footer';
 import LoginSignup from './components/LoginSignup';
@@ -54,6 +55,11 @@ function App() {
                 ADMIN ROUTES - No Header/Footer
                 ======================================== */}
             <Route path="/admin/*" element={<AdminRoutes />} />
+
+            {/* ========================================
+                CP ROUTES - No Header/Footer (they have their own)
+                ======================================== */}
+            <Route path="/cp/*" element={<CPRoutes />} />
 
             {/* ========================================
                 LOGIN ROUTE - No Header/Footer

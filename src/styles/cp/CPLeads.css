@@ -1,0 +1,327 @@
+/* CPLeads.css */
+/* ===================================================== */
+/* CP Leads Management Page */
+/* ===================================================== */
+
+.cp-leads-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding-top: 80px;
+}
+
+.cp-leads-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Header */
+.leads-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.leads-header h1 {
+  font-size: 2rem;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.leads-header p {
+  color: #666;
+  font-size: 1rem;
+}
+
+.btn-add-lead {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  background: #000000;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-add-lead:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+/* Controls */
+.leads-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Status Tabs */
+.status-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 0.5rem;
+}
+
+.status-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: none;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.status-tab:hover {
+  background: #f8f9fa;
+  color: #1a1a1a;
+}
+
+.status-tab.active {
+  background: #000000;
+  color: white;
+  border-color: #000000;
+}
+
+.count-badge {
+  padding: 0.25rem 0.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.status-tab.active .count-badge {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.count-badge.success {
+  background: #d4edda;
+  color: #28a745;
+}
+
+.status-tab.active .count-badge.success {
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+/* Search Bar */
+.search-bar-leads {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.search-bar-leads:focus-within {
+  border-color: #000000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+.search-bar-leads svg {
+  color: #666;
+  flex-shrink: 0;
+}
+
+.search-bar-leads input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+  background: none;
+}
+
+.search-bar-leads input::placeholder {
+  color: #999;
+}
+
+/* Stats Bar */
+.leads-stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-item-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.stat-item-bar:hover {
+  border-color: #000000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.stat-label-bar {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.stat-value-bar {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.stat-value-bar.success {
+  color: #28a745;
+}
+
+.stat-value-bar.info {
+  color: #007bff;
+}
+
+/* Error Banner */
+.error-banner-leads {
+  background: #fff5f5;
+  border: 2px solid #dc3545;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #dc3545;
+}
+
+.error-banner-leads button {
+  padding: 0.5rem 1rem;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.error-banner-leads button:hover {
+  background: #c82333;
+}
+
+/* Empty State */
+.empty-state-leads {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 16px;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.empty-state-leads h3 {
+  font-size: 1.5rem;
+  color: #1a1a1a;
+  margin: 1rem 0 0.5rem;
+  font-weight: 700;
+}
+
+.empty-state-leads p {
+  color: #666;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.btn-clear-filters,
+.btn-add-first {
+  padding: 0.875rem 2rem;
+  background: #000000;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-clear-filters:hover,
+.btn-add-first:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+/* Leads Grid */
+.leads-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .leads-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .leads-stats-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .cp-leads-container {
+    padding: 1rem;
+  }
+
+  .leads-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .leads-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .btn-add-lead {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .status-tabs {
+    flex-direction: column;
+  }
+
+  .status-tab {
+    justify-content: space-between;
+  }
+
+  .leads-stats-bar,
+  .leads-grid {
+    grid-template-columns: 1fr;
+  }
+}

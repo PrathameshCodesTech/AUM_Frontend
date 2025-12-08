@@ -13,6 +13,7 @@ import AdminPropertyDetail from '../pages/admin/AdminPropertyDetail';
 import AdminInvestments from '../pages/admin/AdminInvestments';
 import AdminInvestmentDetail from '../pages/admin/AdminInvestmentDetail';
 
+import AdminCPRoutes from './AdminCPRoutes'; // Add this import
 // Protected Route Component
 const ProtectedAdminRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -68,6 +69,9 @@ const AdminRoutes = () => {
         {/* Investment Management */}
         <Route path="investments" element={<AdminInvestments />} />
         <Route path="investments/:investmentId" element={<AdminInvestmentDetail />} />
+
+        {/* CP Routes */}
+        <Route path="cp/*" element={<AdminCPRoutes />} />
       </Route>
     </Routes>
   );

@@ -1,0 +1,281 @@
+/* CPCommissions.css */
+/* ===================================================== */
+/* CP Commissions Page */
+/* ===================================================== */
+
+.cp-commissions-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding-top: 80px;
+}
+
+.cp-commissions-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Header */
+.commissions-header {
+  margin-bottom: 2rem;
+}
+
+.commissions-header h1 {
+  font-size: 2rem;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.commissions-header p {
+  color: #666;
+  font-size: 1rem;
+}
+
+/* Summary Grid */
+.commission-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.summary-card-commission {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  transition: all 0.3s ease;
+}
+
+.summary-card-commission:hover {
+  border-color: #000000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.summary-card-commission.primary {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.summary-card-commission.warning {
+  border-color: #ffc107;
+}
+
+.summary-card-commission.info {
+  border-color: #007bff;
+}
+
+.summary-card-commission.success {
+  border-color: #28a745;
+}
+
+.summary-icon-comm {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.summary-content-comm {
+  flex: 1;
+}
+
+.summary-label-comm {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.summary-value-comm {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.summary-count-comm {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Filters */
+.commission-filters {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.filter-btn-comm {
+  padding: 0.75rem 1.5rem;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-btn-comm:hover {
+  border-color: #000000;
+  color: #1a1a1a;
+  background: #f8f9fa;
+}
+
+.filter-btn-comm.active {
+  background: #000000;
+  color: white;
+  border-color: #000000;
+}
+
+/* Error Banner */
+.error-banner-comm {
+  background: #fff5f5;
+  border: 2px solid #dc3545;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #dc3545;
+}
+
+.error-banner-comm button {
+  padding: 0.5rem 1rem;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.error-banner-comm button:hover {
+  background: #c82333;
+}
+
+/* Empty State */
+.empty-state-comm {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 16px;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.empty-state-comm h3 {
+  font-size: 1.5rem;
+  color: #1a1a1a;
+  margin: 1rem 0 0.5rem;
+  font-weight: 700;
+}
+
+.empty-state-comm p {
+  color: #666;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.btn-clear-filter-comm {
+  padding: 0.875rem 2rem;
+  background: #000000;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-clear-filter-comm:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+/* Commissions List */
+.commissions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Info Box */
+.info-box-comm {
+  background: #f0f7ff;
+  border: 2px solid #007bff;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.info-box-comm h4 {
+  font-size: 1.1rem;
+  color: #1a1a1a;
+  margin: 0 0 1rem;
+  font-weight: 700;
+}
+
+.info-box-comm ul {
+  margin: 0 0 1rem;
+  padding-left: 1.5rem;
+}
+
+.info-box-comm li {
+  color: #1976d2;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  margin-bottom: 0.5rem;
+}
+
+.info-box-comm li strong {
+  color: #0d47a1;
+}
+
+.info-box-comm p {
+  margin: 0;
+  color: #1976d2;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .commission-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .cp-commissions-container {
+    padding: 1rem;
+  }
+
+  .commissions-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .commission-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .commission-filters {
+    flex-direction: column;
+  }
+
+  .filter-btn-comm {
+    width: 100%;
+  }
+}

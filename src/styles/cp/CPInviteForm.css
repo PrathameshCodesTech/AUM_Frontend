@@ -1,0 +1,216 @@
+/* CPInviteForm.css */
+/* ===================================================== */
+/* CP Invite Form Component - Modal */
+/* ===================================================== */
+
+.modal-overlay-invite {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content-invite {
+  background: white;
+  border-radius: 16px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+/* Modal Header */
+.modal-header-invite {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.modal-header-invite h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.btn-close-modal-invite {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #666;
+}
+
+.btn-close-modal-invite:hover {
+  background: #e9ecef;
+  border-color: #000000;
+  color: #000000;
+}
+
+/* Info Banner */
+.info-banner-invite {
+  padding: 1.5rem;
+  background: #f0f7ff;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.info-banner-invite p {
+  margin: 0;
+  color: #1976d2;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* Invite Form */
+.invite-form {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group-invite {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group-invite.full-width {
+  width: 100%;
+}
+
+.form-label-invite {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #333;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-input-invite,
+.form-textarea-invite {
+  padding: 0.875rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: #f8f9fa;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.form-input-invite:focus,
+.form-textarea-invite:focus {
+  outline: none;
+  border-color: #000000;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+.form-input-invite.error {
+  border-color: #dc3545;
+  background: #fff5f5;
+}
+
+.form-textarea-invite {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.error-text-invite {
+  font-size: 0.85rem;
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.helper-text-invite {
+  font-size: 0.85rem;
+  color: #666;
+  font-style: italic;
+}
+
+/* Form Actions */
+.form-actions-invite {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #f0f0f0;
+}
+
+.btn-cancel-invite,
+.btn-submit-invite {
+  padding: 0.875rem 2rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel-invite {
+  background: white;
+  color: #1a1a1a;
+  border: 2px solid #e0e0e0;
+}
+
+.btn-cancel-invite:hover:not(:disabled) {
+  border-color: #000000;
+  background: #f8f9fa;
+}
+
+.btn-submit-invite {
+  background: #000000;
+  color: white;
+}
+
+.btn-submit-invite:hover:not(:disabled) {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.btn-cancel-invite:disabled,
+.btn-submit-invite:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .modal-content-invite {
+    max-height: 95vh;
+  }
+
+  .invite-form {
+    padding: 1.25rem;
+  }
+
+  .form-actions-invite {
+    flex-direction: column-reverse;
+  }
+
+  .btn-cancel-invite,
+  .btn-submit-invite {
+    width: 100%;
+  }
+}

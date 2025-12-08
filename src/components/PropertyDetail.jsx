@@ -26,6 +26,10 @@ const PropertyDetail = () => {
   const [earningsAmount, setEarningsAmount] = useState(500000);
   const [loadingEarnings, setLoadingEarnings] = useState(false);
 
+  const [referralCode, setReferralCode] = useState('');
+  const [validatingCode, setValidatingCode] = useState(false);
+  const [codeValidation, setCodeValidation] = useState(null); // { valid: true/false, message: '', cp_name: '' }
+
   useEffect(() => {
     fetchPropertyDetail();
   }, [propertyId]);
@@ -110,7 +114,8 @@ const PropertyDetail = () => {
       const response = await investmentService.createInvestment(
         property.id,
         investmentAmount,
-        unitsCount
+        unitsCount,
+        codeValidation?.valid ? referralCode : null  // ← Add this parameter
       );
 
       if (response.success) {
@@ -206,6 +211,33 @@ const PropertyDetail = () => {
     }
   };
 
+  const validateReferralCode = async (code) => {
+    if (!code.trim()) {
+      setCodeValidation(null);
+      return;
+    }
+
+    setValidatingCode(true);
+    try {
+      const response = await investmentService.validateCPCode(code); // or cpService.validateCode(code)
+      if (response.success) {
+        setCodeValidation({
+          valid: true,
+          message: response.message,
+          cp_name: response.data.cp_name, // Channel Partner name
+          cp_id: response.data.cp_id
+        });
+      }
+    } catch (error) {
+      setCodeValidation({
+        valid: false,
+        message: error.message || 'Invalid referral code'
+      });
+    } finally {
+      setValidatingCode(false);
+    }
+  };
+
   return (
     <div className="property-detail-page">
       <div className="property-detail-container">
@@ -223,30 +255,30 @@ const PropertyDetail = () => {
           <div className="property-left">
             {/* Image Gallery */}
             <div className="image-gallery">
-             <div className="main-image">
-  <img 
-    src={allImages[selectedImageIndex] || 'https://via.placeholder.com/800x600?text=No+Image'} 
-    alt={property.name} 
-  />
-  {property.is_featured && <span className="featured-badge">Featured</span>}
-  
-  <div className="property-badges">
-    <span className={`badge-property-type ${property.property_type}`}>
-      {property.property_type === 'equity' ? 'Equity' : 
-       property.property_type === 'debt_income' ? 'Debt Income' : 
-       property.property_type === 'hybrid' ? 'Hybrid' : 
-       property.property_type}
-    </span>
-    <span className={`badge-status status-${property.status}`}>
-      {property.status === 'live' ? 'Live' :
-       property.status === 'funding' ? 'Funding' :
-       property.status === 'funded' ? 'Fully Funded' :
-       property.status === 'under_construction' ? 'Under Construction' :
-       property.status === 'completed' ? 'Completed' :
-       property.status}
-    </span>
-  </div>
-</div>
+              <div className="main-image">
+                <img
+                  src={allImages[selectedImageIndex] || 'https://via.placeholder.com/800x600?text=No+Image'}
+                  alt={property.name}
+                />
+                {property.is_featured && <span className="featured-badge">Featured</span>}
+
+                <div className="property-badges">
+                  <span className={`badge-property-type ${property.property_type}`}>
+                    {property.property_type === 'equity' ? 'Equity' :
+                      property.property_type === 'debt_income' ? 'Debt Income' :
+                        property.property_type === 'hybrid' ? 'Hybrid' :
+                          property.property_type}
+                  </span>
+                  <span className={`badge-status status-${property.status}`}>
+                    {property.status === 'live' ? 'Live' :
+                      property.status === 'funding' ? 'Funding' :
+                        property.status === 'funded' ? 'Fully Funded' :
+                          property.status === 'under_construction' ? 'Under Construction' :
+                            property.status === 'completed' ? 'Completed' :
+                              property.status}
+                  </span>
+                </div>
+              </div>
 
               {allImages.length > 1 && (
                 <div className="image-thumbnails">
@@ -535,6 +567,8 @@ const PropertyDetail = () => {
                     </p>
                   </div>
 
+
+
                   {/* Quick Amount Buttons */}
                   <div className="quick-amounts">
                     {[500000, 1000000, 2000000, 5000000].map(amount => (
@@ -759,7 +793,7 @@ const PropertyDetail = () => {
 
             <div className="invest-inputs">
               <div className="input-group">
-                <label>Number of Units</label>
+                <label>Number of Shares</label>
                 <div className="unit-selector">
                   <button
                     onClick={() => handleUnitsChange(unitsCount - 1)}
@@ -781,7 +815,7 @@ const PropertyDetail = () => {
                     +
                   </button>
                 </div>
-                <span className="input-hint">{property.available_units} units available</span>
+                <span className="input-hint">{property.available_units} Shares available</span>
               </div>
 
               <div className="input-group">
@@ -794,6 +828,31 @@ const PropertyDetail = () => {
                   step="1000"
                 />
                 <span className="input-hint">Min: {formatCurrency(property.minimum_investment)}</span>
+              </div>
+
+              <div className="input-group">
+                <label>Referred by</label>
+                <div className="referral-input-wrapper">
+                  <input
+                    type="text"
+                    value={referralCode}
+                    onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                    onBlur={() => validateReferralCode(referralCode)}
+                    placeholder="Enter CP referral code"
+                    maxLength={10}
+                  />
+                  {validatingCode && <span className="validating">Checking...</span>}
+                </div>
+
+                {codeValidation && (
+                  <span className={`validation-message ${codeValidation.valid ? 'valid' : 'invalid'}`}>
+                    {codeValidation.valid && '✓ '}
+                    {codeValidation.message}
+                    {codeValidation.cp_name && ` - ${codeValidation.cp_name}`}
+                  </span>
+                )}
+
+                <span className="input-hint">Have a Channel Partner code? Enter it here</span>
               </div>
             </div>
 

@@ -1,0 +1,176 @@
+/* CPCommissionCard.css */
+/* ===================================================== */
+/* CP Commission Card Component */
+/* ===================================================== */
+
+.cp-commission-card {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: all 0.3s ease;
+}
+
+.cp-commission-card:hover {
+  border-color: #000000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Commission Header */
+.commission-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.commission-amount-section {
+  flex: 1;
+}
+
+.amount-label {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.amount-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.commission-status-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: white;
+}
+
+/* Details Grid */
+.commission-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.detail-group-comm {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.detail-icon-comm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  color: #667eea;
+  flex-shrink: 0;
+}
+
+.detail-icon-comm.rate {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.detail-content-comm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.detail-label-comm {
+  font-size: 0.75rem;
+  color: #666;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.detail-value-comm {
+  font-size: 0.95rem;
+  color: #1a1a1a;
+  font-weight: 700;
+}
+
+/* Timeline */
+.commission-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #f0f7ff;
+  border-radius: 8px;
+}
+
+.timeline-item-comm {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #1976d2;
+  font-size: 0.85rem;
+}
+
+.timeline-item-comm svg {
+  flex-shrink: 0;
+}
+
+.timeline-item-comm.success {
+  color: #28a745;
+}
+
+.timeline-text {
+  font-weight: 600;
+}
+
+/* Commission Notes */
+.commission-notes {
+  padding: 1rem;
+  background: #fff8e1;
+  border-left: 3px solid #ffc107;
+  border-radius: 6px;
+  color: #e65100;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.commission-notes strong {
+  font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .commission-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .commission-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .amount-value {
+    font-size: 1.75rem;
+  }
+}
