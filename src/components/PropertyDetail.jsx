@@ -46,7 +46,8 @@ const PropertyDetail = () => {
       const response = await propertyService.getPropertyDetail(propertyId);
       if (response.success) {
         setProperty(response.data);
-        setInvestmentAmount(response.data.minimum_investment);
+        const pricePerUnit = parseFloat(response.data.price_per_unit);
+        setInvestmentAmount(pricePerUnit * 1);
         setUnitsCount(1);
       }
 
@@ -111,13 +112,21 @@ const PropertyDetail = () => {
 
     setInvesting(true);
     try {
+      const referralCodeToSend = referralCode.trim() || null;
+
+      console.log('🔍 Sending to backend:', {
+        property_id: property.id,
+        amount: investmentAmount,
+        units_count: unitsCount,
+        referral_code: referralCodeToSend
+      });
+
       const response = await investmentService.createInvestment(
         property.id,
         investmentAmount,
         unitsCount,
-        codeValidation?.valid ? referralCode : null  // ← Add this parameter
+        referralCode.trim() || null  // Always send if entered, backend validates
       );
-
       if (response.success) {
         toast.success(response.message);
         setShowInvestModal(false);
@@ -147,12 +156,16 @@ const PropertyDetail = () => {
 
   const handleAmountChange = (newAmount) => {
     const amount = parseFloat(newAmount);
-    if (isNaN(amount) || amount < 0) return;
+    if (isNaN(amount) || amount < parseFloat(property.minimum_investment)) return;
 
-    setInvestmentAmount(newAmount);
-    const units = Math.floor(amount / parseFloat(property.price_per_unit));
-    setUnitsCount(units || 1);
+    // Calculate units based on amount, but ensure it's a valid multiple
+    const calculatedUnits = Math.floor(amount / parseFloat(property.price_per_unit));
+    if (calculatedUnits < 1) return;
+
+    setUnitsCount(calculatedUnits);
+    setInvestmentAmount(calculatedUnits * parseFloat(property.price_per_unit));
   };
+
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-IN', {
@@ -836,7 +849,14 @@ const PropertyDetail = () => {
                   <input
                     type="text"
                     value={referralCode}
-                    onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                    onChange={(e) => {
+                      let value = e.target.value.toUpperCase().trim();
+                      // Auto-add CP prefix if not present
+                      if (value && !value.startsWith('CP')) {
+                        value = 'CP' + value;
+                      }
+                      setReferralCode(value);
+                    }}
                     onBlur={() => validateReferralCode(referralCode)}
                     placeholder="Enter CP referral code"
                     maxLength={10}

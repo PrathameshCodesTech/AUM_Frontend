@@ -100,13 +100,13 @@ const Properties = () => {
                 className={filters.status === 'public_sale' ? 'active' : ''}
                 onClick={() => setFilters(prev => ({ ...prev, status: 'public_sale' }))}
               >
-                Public Sale
+                Live Opportunities
               </button>
               <button 
                 className={filters.status === 'presale' ? 'active' : ''}
                 onClick={() => setFilters(prev => ({ ...prev, status: 'presale' }))}
               >
-                Presale
+                Coming Soon
               </button>
             </div>
           </div>
@@ -167,39 +167,13 @@ const Properties = () => {
             </div>
           )}
 
-          {/* Builder's Name Filter */}
-          {filterOptions.builders.length > 0 && (
-            <div className="filter-section">
-              <div className="filter-title">
-                <span>Builder's Name</span>
-                {filters.builder_name && (
-                  <button 
-                    className="clear-filter"
-                    onClick={() => handleFilterChange('builder_name', '')}
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-              <div className="filter-options">
-                {filterOptions.builders.map((builder) => (
-                  <button 
-                    key={builder} 
-                    className={`filter-chip ${filters.builder_name === builder ? 'active' : ''}`}
-                    onClick={() => handleFilterChange('builder_name', builder)}
-                  >
-                    {builder}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+        
         </aside>
 
         {/* Main Content */}
         <main className="properties-main">
           <div className="properties-header">
-            <h1>Properties</h1>
+            <h1>Investment</h1>
             <div className="search-sort-bar">
               <div className="search-box">
                 <svg className="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">

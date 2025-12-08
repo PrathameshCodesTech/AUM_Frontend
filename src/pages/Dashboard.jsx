@@ -235,8 +235,8 @@ const Dashboard = () => {
             </h1>
             <p className="hero-subtitle">
               {isFullyComplete 
-                ? 'Your profile is complete! Start exploring investment opportunities.'
-                : 'Complete your setup to unlock all features and start investing in properties.'}
+                ? 'Investing in High Value Assets.'
+                : 'Complete your setup to unlock all features and start investing.'}
             </p>
 
             {loading ? (
@@ -493,14 +493,14 @@ const Dashboard = () => {
           <div className="stat-item">
             <div className="stat-icon-dash">{renderIcon('chart')}</div>
             <div className="stat-info">
-              <span className="stat-label">Total Properties</span>
+              <span className="stat-label">Total Investments</span>
               <span className="stat-value">500+</span>
             </div>
           </div>
           <div className="stat-item">
             <div className="stat-icon-dash">{renderIcon('users')}</div>
             <div className="stat-info">
-              <span className="stat-label">Active Investors</span>
+              <span className="stat-label">Active Users</span>
               <span className="stat-value">10K+</span>
             </div>
           </div>

@@ -2,18 +2,20 @@ import api from './api';
 
 const investmentService = {
   // Create new investment
-  createInvestment: async (propertyId, amount, unitsCount) => {
-    try {
-      const response = await api.post('/wallet/investments/create/', {
-        property_id: propertyId,
-        amount,
-        units_count: unitsCount
-      });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { error: 'Failed to create investment' };
-    }
-  },
+// Create new investment
+createInvestment: async (propertyId, amount, unitsCount, referralCode) => {  // ✅ Add referralCode
+  try {
+    const response = await api.post('/wallet/investments/create/', {
+      property_id: propertyId,
+      amount,
+      units_count: unitsCount,
+      referral_code: referralCode  // ✅ ADD THIS LINE
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: 'Failed to create investment' };
+  }
+},
 
   // Get user's investments
   getMyInvestments: async () => {

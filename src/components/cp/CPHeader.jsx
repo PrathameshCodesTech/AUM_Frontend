@@ -79,10 +79,7 @@ const CPHeader = () => {
         </nav>
 
         <div className="cp-header-right">
-          <div className="cp-code-display">
-            <span className="cp-code-label">CP Code:</span>
-            <span className="cp-code-value">{cpCode}</span>
-          </div>
+          
 
           <div className="cp-user-menu-wrapper" ref={userMenuRef}>
             <div 

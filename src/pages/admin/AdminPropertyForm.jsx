@@ -511,122 +511,134 @@ const AdminPropertyForm = () => {
         </div>
 
         {/* Unit & Pricing */}
-        <div className="form-section">
-          <h3 className="section-title">Units & Pricing</h3>
-          <div className="form-grid">
-            <div className="form-group">
-              <label>Total Units</label>
-              <input
-                type="number"
-                name="total_units"
-                value={formData.total_units}
-                onChange={handleInputChange}
-                placeholder="e.g., 100"
-                min="1"
-              />
-            </div>
+{/* Shares & Pricing */}
+<div className="form-section">
+  <h3 className="section-title">Shares & Pricing</h3>
+  <div className="form-grid">
+    <div className="form-group">
+      <label>Total Shares *</label>
+      <input
+        type="number"
+        name="total_units"
+        value={formData.total_units}
+        onChange={handleInputChange}
+        placeholder="e.g., 1000"
+        min="1"
+        required
+      />
+      <small className="hint">Total number of shares available for this property</small>
+    </div>
 
-            <div className="form-group">
-              <label>Available Units</label>
-              <input
-                type="number"
-                name="available_units"
-                value={formData.available_units}
-                onChange={handleInputChange}
-                placeholder="e.g., 50"
-                min="0"
-              />
-            </div>
+    <div className="form-group">
+      <label>Available Shares</label>
+      <input
+        type="number"
+        name="available_units"
+        value={formData.available_units}
+        onChange={handleInputChange}
+        placeholder="e.g., 750"
+        min="0"
+      />
+      <small className="hint">Shares currently available for investment</small>
+    </div>
 
-            <div className="form-group">
-              <label>Total Area (sq ft)</label>
-              <input
-                type="number"
-                name="total_area"
-                value={formData.total_area}
-                onChange={handleInputChange}
-                placeholder="e.g., 120000"
-                min="0"
-                step="0.01"
-              />
-            </div>
+    <div className="form-group">
+      <label>Price Per Share (₹) *</label>
+      <input
+        type="number"
+        name="price_per_unit"
+        value={formData.price_per_unit}
+        onChange={handleInputChange}
+        placeholder="e.g., 10000"
+        min="1"
+        step="0.01"
+        required
+      />
+      <small className="hint">Price of one share</small>
+    </div>
 
-            <div className="form-group">
-              <label>Price Per Unit (₹)</label>
-              <input
-                type="number"
-                name="price_per_unit"
-                value={formData.price_per_unit}
-                onChange={handleInputChange}
-                placeholder="e.g., 1500000"
-                min="0"
-                step="0.01"
-              />
-            </div>
+    <div className="form-group">
+      <label>Total Property Value (₹)</label>
+      <input type="number" value={totalPrice || ""} readOnly />
+      <small className="hint">
+        Auto-calculated = Price per share × Total shares
+      </small>
+    </div>
 
-            <div className="form-group">
-              <label>Minimum Investment (₹) *</label>
-              <input
-                type="number"
-                name="minimum_investment"
-                value={formData.minimum_investment}
-                onChange={handleInputChange}
-                placeholder="e.g., 25000"
-                min="1"
-                step="0.01"
-                required
-              />
-            </div>
+    <div className="form-group">
+      <label>Minimum Investment (₹) *</label>
+      <input
+        type="number"
+        name="minimum_investment"
+        value={formData.minimum_investment}
+        onChange={handleInputChange}
+        placeholder="e.g., 50000"
+        min="1"
+        step="0.01"
+        required
+      />
+      <small className="hint">Minimum amount an investor can invest</small>
+    </div>
 
-            <div className="form-group">
-              <label>Maximum Investment (₹)</label>
-              <input
-                type="number"
-                name="maximum_investment"
-                value={formData.maximum_investment}
-                onChange={handleInputChange}
-                placeholder="e.g., 500000"
-                min="0"
-                step="0.01"
-              />
-            </div>
+    <div className="form-group">
+      <label>Maximum Investment (₹)</label>
+      <input
+        type="number"
+        name="maximum_investment"
+        value={formData.maximum_investment}
+        onChange={handleInputChange}
+        placeholder="e.g., 5000000"
+        min="0"
+        step="0.01"
+      />
+      <small className="hint">Maximum amount per investor (optional)</small>
+    </div>
 
-            <div className="form-group">
-              <label>Target Amount (₹) *</label>
-              <input
-                type="number"
-                name="target_amount"
-                value={formData.target_amount}
-                onChange={handleInputChange}
-                placeholder="e.g., 10000000"
-                min="1"
-                step="0.01"
-                required
-              />
-            </div>
+    <div className="form-group">
+      <label>Target Funding Amount (₹) *</label>
+      <input
+        type="number"
+        name="target_amount"
+        value={formData.target_amount}
+        onChange={handleInputChange}
+        placeholder="e.g., 10000000"
+        min="1"
+        step="0.01"
+        required
+      />
+      <small className="hint">Total funding goal for this property</small>
+    </div>
 
-            <div className="form-group">
-              <label>Funded Amount (₹)</label>
-              <input
-                type="number"
-                name="funded_amount"
-                value={formData.funded_amount}
-                onChange={handleInputChange}
-                placeholder="auto / current funded amount"
-                min="0"
-                step="0.01"
-              />
-            </div>
+    <div className="form-group">
+      <label>Current Funded Amount (₹)</label>
+      <input
+        type="number"
+        name="funded_amount"
+        value={formData.funded_amount}
+        onChange={handleInputChange}
+        placeholder="Auto-calculated from investments"
+        min="0"
+        step="0.01"
+      />
+      <small className="hint">Leave blank for auto-calculation</small>
+    </div>
 
-            <div className="form-group">
-              <label>Total Price (₹)</label>
-              <input type="number" value={totalPrice || ""} readOnly />
-              <small className="hint">
-                Auto-calculated = price_per_unit × total_units
-              </small>
-            </div>
-          </div>
-        </div>
+    {/* Optional: Keep total_area but with different label */}
+    <div className="form-group">
+      <label>Property Area (sq ft)</label>
+      <input
+        type="number"
+        name="total_area"
+        value={formData.total_area}
+        onChange={handleInputChange}
+        placeholder="e.g., 5000"
+        min="0"
+        step="0.01"
+      />
+      <small className="hint">Total built-up area (optional)</small>
+    </div>
+  </div>
+</div>
 
         {/* Returns & Tenure */}
         <div className="form-section">

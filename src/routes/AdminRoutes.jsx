@@ -12,7 +12,7 @@ import AdminPropertyForm from '../pages/admin/AdminPropertyForm';
 import AdminPropertyDetail from '../pages/admin/AdminPropertyDetail';
 import AdminInvestments from '../pages/admin/AdminInvestments';
 import AdminInvestmentDetail from '../pages/admin/AdminInvestmentDetail';
-
+import AdminCommissions from '../pages/admin/AdminCommissions';
 import AdminCPRoutes from './AdminCPRoutes'; // Add this import
 // Protected Route Component
 const ProtectedAdminRoute = ({ children }) => {
@@ -69,6 +69,7 @@ const AdminRoutes = () => {
         {/* Investment Management */}
         <Route path="investments" element={<AdminInvestments />} />
         <Route path="investments/:investmentId" element={<AdminInvestmentDetail />} />
+        <Route path="/admin/commissions" element={<AdminCommissions />} />
 
         {/* CP Routes */}
         <Route path="cp/*" element={<AdminCPRoutes />} />

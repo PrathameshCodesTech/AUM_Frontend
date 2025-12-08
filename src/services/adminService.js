@@ -515,6 +515,78 @@ const adminService = {
     };
   }
 },
+
+// Add these methods to adminService.js
+
+// ========================================
+// COMMISSION MANAGEMENT
+// ========================================
+
+// Get all commissions
+getAllCommissions: async (status = null) => {
+  try {
+    const params = status ? { status } : {};
+    const response = await api.get('/admin/commissions/', { params });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+},
+
+// Get commission stats
+getCommissionStats: async () => {
+  try {
+    const response = await api.get('/admin/commissions/stats/');
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+},
+
+// Get CP commissions
+getCPCommissions: async (cpId, status = null) => {
+  try {
+    const response = await api.get(`/admin/commissions/by-cp/${cpId}/`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+},
+
+// Approve commission
+approveCommission: async (commissionId) => {
+  try {
+    const response = await api.post(`/admin/commissions/${commissionId}/approve/`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+},
+
+// Payout commission
+payoutCommission: async (commissionId, paymentReference) => {
+  try {
+    const response = await api.post(`/admin/commissions/${commissionId}/payout/`, {
+      payment_reference: paymentReference
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+},
+
+// Bulk payout
+bulkPayoutCommissions: async (commissionIds, paymentReference) => {
+  try {
+    const response = await api.post('/admin/commissions/bulk-payout/', {
+      commission_ids: commissionIds,
+      payment_reference: paymentReference
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+},
 };
 
 export default adminService;

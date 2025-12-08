@@ -11,7 +11,7 @@ import '../../styles/cp/CPLeadForm.css';
 
 const CPLeadForm = ({ lead = null, onSubmit, onClose }) => {
   const [formData, setFormData] = useState({
-    name: '',
+    customer_name: '',
     email: '',
     phone: '',
     property_interested: '',
@@ -26,7 +26,7 @@ const CPLeadForm = ({ lead = null, onSubmit, onClose }) => {
   useEffect(() => {
     if (lead) {
       setFormData({
-        name: lead.name || '',
+        customer_name: lead.customer_name || '',
         email: lead.email || '',
         phone: lead.phone || '',
         property_interested: lead.property_interested || '',
@@ -54,15 +54,16 @@ const CPLeadForm = ({ lead = null, onSubmit, onClose }) => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+    if (!formData.customer_name.trim()) {
+      newErrors.customer_name = 'Name is required';
     }
 
     if (!formData.phone.trim()) {
       newErrors.phone = 'Phone is required';
-    } else if (!/^[6-9]\d{9}$/.test(formData.phone.replace(/[\s-]/g, ''))) {
-      newErrors.phone = 'Invalid phone number';
-    }
+    } else if (!/^\+91[6-9]\d{9}$/.test(formData.phone)) {
+  newErrors.phone = 'Phone must start with +91 and be 10 digits';
+}
+
 
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Invalid email address';
@@ -110,12 +111,12 @@ const CPLeadForm = ({ lead = null, onSubmit, onClose }) => {
             <label className="form-label-lead">Name *</label>
             <input
               type="text"
-              className={`form-input-lead ${errors.name ? 'error' : ''}`}
-              value={formData.name}
-              onChange={(e) => handleChange('name', e.target.value)}
+              className={`form-input-lead ${errors.customer_name ? 'error' : ''}`}
+              value={formData.customer_name}
+              onChange={(e) => handleChange('customer_name', e.target.value)}
               placeholder="Enter full name"
             />
-            {errors.name && <span className="error-text">{errors.name}</span>}
+            {errors.customer_name && <span className="error-text">{errors.customer_name}</span>}
           </div>
 
           {/* Phone */}

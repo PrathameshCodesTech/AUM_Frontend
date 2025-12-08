@@ -23,7 +23,7 @@ const menuItems = [
     {
       id: 'properties',
       icon: 'properties',
-      label: 'Properties',
+      label: 'Live Opportunities',
       path: '/properties'
     },
     {

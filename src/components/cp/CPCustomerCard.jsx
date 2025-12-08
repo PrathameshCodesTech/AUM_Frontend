@@ -5,7 +5,7 @@
 // =====================================================
 
 import React from 'react';
-import { FiPhone, FiMail, FiDollarSign, FiClock, FiAlertCircle } from 'react-icons/fi';
+import { FiPhone, FiMail, FiClock, FiAlertCircle } from 'react-icons/fi';
 import '../../styles/cp/CPCustomerCard.css';
 
 const CPCustomerCard = ({ customer }) => {
@@ -103,7 +103,7 @@ const CPCustomerCard = ({ customer }) => {
       <div className="investment-stats">
         <div className="stat-row-customer">
           <div className="stat-item-cust">
-            <FiDollarSign size={16} className="stat-icon-cust" />
+            <span className="stat-icon-cust" style={{ fontSize: '16px', fontWeight: 'bold' }}>₹</span>
             <div className="stat-details-cust">
               <span className="stat-label-cust">Total Invested</span>
               <span className="stat-value-cust success">

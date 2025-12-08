@@ -32,64 +32,70 @@ const AdminPropertyDetail = () => {
     fetchPropertyDetail();
   }, [propertyId]);
 
+  // ========================================
+  // DATA FETCHING
+  // ========================================
+
   const fetchPropertyDetail = async () => {
-  setLoading(true);
-  setError(null);
-  
-  try {
-    const response = await adminService.getPropertyDetail(propertyId);
+    setLoading(true);
+    setError(null);
     
-    if (response.success) {
-      setProperty(response.data);
+    try {
+      const response = await adminService.getPropertyDetail(propertyId);
       
-      // Set nested data
-      setImages(response.data.images || []);
-      setDocuments(response.data.documents || []);
-      setUnits(response.data.units || []);
-    } else {
-      throw new Error(response.message || 'Failed to fetch property');
+      if (response.success) {
+        setProperty(response.data);
+        setImages(response.data.images || []);
+        setDocuments(response.data.documents || []);
+        setUnits(response.data.units || []);
+      } else {
+        throw new Error(response.message || 'Failed to fetch property');
+      }
+    } catch (error) {
+      console.error('❌ Error fetching property detail:', error);
+      setError(error.message || 'Failed to load property details');
+      toast.error('Failed to load property details');
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error('❌ Error fetching property detail:', error);
-    setError(error.message || 'Failed to load property details');
-    toast.error('Failed to load property details');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
-const refreshImages = async () => {
-  try {
-    const response = await adminService.getPropertyImages(propertyId);
-    if (response.success) {
-      setImages(response.results);
+  const refreshImages = async () => {
+    try {
+      const response = await adminService.getPropertyImages(propertyId);
+      if (response.success) {
+        setImages(response.results);
+      }
+    } catch (error) {
+      console.error('❌ Error refreshing images:', error);
     }
-  } catch (error) {
-    console.error('❌ Error refreshing images:', error);
-  }
-};
+  };
 
-const refreshDocuments = async () => {
-  try {
-    const response = await adminService.getPropertyDocuments(propertyId);
-    if (response.success) {
-      setDocuments(response.results);
+  const refreshDocuments = async () => {
+    try {
+      const response = await adminService.getPropertyDocuments(propertyId);
+      if (response.success) {
+        setDocuments(response.results);
+      }
+    } catch (error) {
+      console.error('❌ Error refreshing documents:', error);
     }
-  } catch (error) {
-    console.error('❌ Error refreshing documents:', error);
-  }
-};
+  };
 
-const refreshUnits = async () => {
-  try {
-    const response = await adminService.getPropertyUnits(propertyId);
-    if (response.success) {
-      setUnits(response.results);
+  const refreshUnits = async () => {
+    try {
+      const response = await adminService.getPropertyUnits(propertyId);
+      if (response.success) {
+        setUnits(response.results);
+      }
+    } catch (error) {
+      console.error('❌ Error refreshing units:', error);
     }
-  } catch (error) {
-    console.error('❌ Error refreshing units:', error);
-  }
-};
+  };
+
+  // ========================================
+  // ACTIONS
+  // ========================================
 
   const openActionModal = (action) => {
     const modalConfig = {
@@ -143,7 +149,7 @@ const refreshUnits = async () => {
         response = await adminService.propertyAction(propertyId, actionModal.action);
         if (response.success) {
           toast.success(response.message);
-          setProperty(response.data); // Update with latest data
+          setProperty(response.data);
           setActionModal({ ...actionModal, isOpen: false });
         }
       }
@@ -154,6 +160,10 @@ const refreshUnits = async () => {
     }
   };
 
+  // ========================================
+  // HELPER FUNCTIONS
+  // ========================================
+
   const formatCurrency = (amount) => {
     if (!amount) return '₹0';
     return new Intl.NumberFormat('en-IN', {
@@ -162,6 +172,42 @@ const refreshUnits = async () => {
       maximumFractionDigits: 0,
     }).format(amount);
   };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('en-IN');
+  };
+
+  const formatDateTime = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleString('en-IN');
+  };
+
+  const formatPercentage = (value) => {
+    if (!value) return 'N/A';
+    return `${value}%`;
+  };
+
+  const formatMonths = (value) => {
+    if (!value) return 'N/A';
+    return `${value} months`;
+  };
+
+  // Calculate minimum shares
+  const getMinimumShares = () => {
+    if (!property.minimum_investment || !property.price_per_unit) return 'N/A';
+    return Math.ceil(property.minimum_investment / property.price_per_unit);
+  };
+
+  // Calculate maximum shares
+  const getMaximumShares = () => {
+    if (!property.maximum_investment || !property.price_per_unit) return 'No Limit';
+    return Math.floor(property.maximum_investment / property.price_per_unit);
+  };
+
+  // ========================================
+  // RENDER HELPERS
+  // ========================================
 
   const renderIcon = (iconName) => {
     const icons = {
@@ -196,6 +242,29 @@ const refreshUnits = async () => {
     return icons[iconName] || null;
   };
 
+  const InfoItem = ({ label, value, fullWidth = false }) => (
+    <div className={`info-item-detail ${fullWidth ? 'full-width' : ''}`}>
+      <span className="info-label-detail">{label}</span>
+      <span className="info-value-detail">{value || 'N/A'}</span>
+    </div>
+  );
+
+  const InfoSection = ({ title, icon, children }) => (
+    <div className="info-section">
+      <h3>
+        {icon && <span className="section-icon">{renderIcon(icon)}</span>}
+        {title}
+      </h3>
+      <div className="info-grid-detail">
+        {children}
+      </div>
+    </div>
+  );
+
+  // ========================================
+  // LOADING & ERROR STATES
+  // ========================================
+
   if (loading) {
     return (
       <div className="admin-loading">
@@ -215,6 +284,10 @@ const refreshUnits = async () => {
       </div>
     );
   }
+
+  // ========================================
+  // MAIN RENDER
+  // ========================================
 
   return (
     <div className="admin-property-detail-page">
@@ -287,7 +360,9 @@ const refreshUnits = async () => {
                 📍 {property.address}, {property.city}
                 {property.state && `, ${property.state}`}
               </p>
-              {property.is_featured && <span className="featured-badge-large">⭐ Featured Property</span>}
+              {property.is_featured && (
+                <span className="featured-badge-large">⭐ Featured Property</span>
+              )}
             </div>
           </div>
           <div className="card-header-right">
@@ -305,333 +380,168 @@ const refreshUnits = async () => {
           )}
 
           {/* Property Details */}
-          <div className="info-section">
-            <h3>
-              <span className="section-icon">{renderIcon('home')}</span>
-              Property Details
-            </h3>
-            <div className="info-grid-detail">
-              <div className="info-item-detail">
-                <span className="info-label-detail">Builder Name</span>
-                <span className="info-value-detail">{property.builder_name || 'N/A'}</span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Property Type</span>
-                <span className="info-value-detail">
-                  {property.property_type?.replace('_', ' ').toUpperCase() || 'N/A'}
-                </span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Total Units</span>
-                <span className="info-value-detail">{property.total_units || 'N/A'}</span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Available Units</span>
-                <span className="info-value-detail">{property.units_available || property.available_units || 'N/A'}</span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Units Sold</span>
-                <span className="info-value-detail">{property.units_sold || 0}</span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Total Area</span>
-                <span className="info-value-detail">
-                  {property.total_area ? `${property.total_area} sq ft` : 'N/A'}
-                </span>
-              </div>
-            </div>
-          </div>
+          <InfoSection title="Property Details" icon="home">
+            <InfoItem label="Builder Name" value={property.builder_name} />
+            <InfoItem 
+              label="Property Type" 
+              value={property.property_type?.replace('_', ' ').toUpperCase()} 
+            />
+            <InfoItem label="Total Shares" value={property.total_units} />
+            <InfoItem 
+              label="Available Shares" 
+              value={property.available_units || property.units_available} 
+            />
+            <InfoItem label="Shares Sold" value={property.units_sold || 0} />
+            <InfoItem 
+              label="Total Area" 
+              value={property.total_area ? `${property.total_area} sq ft` : null} 
+            />
+          </InfoSection>
 
           {/* Location Details */}
-          <div className="info-section">
-            <h3>📍 Location</h3>
-            <div className="info-grid-detail">
-              <div className="info-item-detail full-width">
-                <span className="info-label-detail">Address</span>
-                <span className="info-value-detail">{property.address || 'N/A'}</span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Locality</span>
-                <span className="info-value-detail">{property.locality || 'N/A'}</span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">City</span>
-                <span className="info-value-detail">{property.city || 'N/A'}</span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">State</span>
-                <span className="info-value-detail">{property.state || 'N/A'}</span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Pincode</span>
-                <span className="info-value-detail">{property.pincode || 'N/A'}</span>
-              </div>
-            </div>
-          </div>
+          <InfoSection title="📍 Location">
+            <InfoItem label="Address" value={property.address} fullWidth />
+            <InfoItem label="Locality" value={property.locality} />
+            <InfoItem label="City" value={property.city} />
+            <InfoItem label="State" value={property.state} />
+            <InfoItem label="Pincode" value={property.pincode} />
+          </InfoSection>
 
-          {/* Pricing */}
-          <div className="info-section">
-            <h3>
-              <span className="section-icon">{renderIcon('money')}</span>
-              Pricing & Funding
-            </h3>
-            <div className="info-grid-detail">
-              <div className="info-item-detail">
-                <span className="info-label-detail">Price Per Unit</span>
-                <span className="info-value-detail">{formatCurrency(property.price_per_unit)}</span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Total Value</span>
-                <span className="info-value-detail">{formatCurrency(property.total_value)}</span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Min Investment</span>
-                <span className="info-value-detail">{formatCurrency(property.minimum_investment)}</span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Max Investment</span>
-                <span className="info-value-detail">
-                  {property.maximum_investment ? formatCurrency(property.maximum_investment) : 'No Limit'}
-                </span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Target Amount</span>
-                <span className="info-value-detail">{formatCurrency(property.target_amount)}</span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Funded Amount</span>
-                <span className="info-value-detail">{formatCurrency(property.funded_amount)}</span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Funding Progress</span>
-                <span className="info-value-detail">
-                  {property.funding_percentage ? `${property.funding_percentage.toFixed(1)}%` : '0%'}
-                </span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Fully Funded</span>
-                <span className="info-value-detail">
-                  {property.is_fully_funded ? '✓ Yes' : '✗ No'}
-                </span>
-              </div>
-            </div>
-          </div>
+          {/* Shares & Pricing */}
+          <InfoSection title="Shares & Pricing" icon="money">
+            <InfoItem 
+              label="Price Per Share" 
+              value={formatCurrency(property.price_per_unit)} 
+            />
+            <InfoItem 
+              label="Total Property Value" 
+              value={formatCurrency(property.total_value || (property.price_per_unit * property.total_units))} 
+            />
+            <InfoItem 
+              label="Minimum Investment" 
+              value={formatCurrency(property.minimum_investment)} 
+            />
+            <InfoItem 
+              label="Minimum Shares" 
+              value={getMinimumShares()} 
+            />
+            <InfoItem 
+              label="Maximum Investment" 
+              value={property.maximum_investment ? formatCurrency(property.maximum_investment) : 'No Limit'} 
+            />
+            <InfoItem 
+              label="Maximum Shares" 
+              value={getMaximumShares()} 
+            />
+          </InfoSection>
+
+          {/* Funding Status */}
+          <InfoSection title="💰 Funding Status" icon="chart">
+            <InfoItem 
+              label="Target Amount" 
+              value={formatCurrency(property.target_amount)} 
+            />
+            <InfoItem 
+              label="Funded Amount" 
+              value={formatCurrency(property.funded_amount)} 
+            />
+            <InfoItem 
+              label="Funding Progress" 
+              value={property.funding_percentage ? `${property.funding_percentage.toFixed(1)}%` : '0%'} 
+            />
+            <InfoItem 
+              label="Fully Funded" 
+              value={property.is_fully_funded ? '✓ Yes' : '✗ No'} 
+            />
+          </InfoSection>
 
           {/* Investment Returns */}
-          <div className="info-section">
-            <h3>
-              <span className="section-icon">{renderIcon('chart')}</span>
-              Investment Returns & Tenure
-            </h3>
-            <div className="info-grid-detail">
-              <div className="info-item-detail">
-                <span className="info-label-detail">Expected Return %</span>
-                <span className="info-value-detail">
-                  {property.expected_return_percentage ? `${property.expected_return_percentage}%` : 'N/A'}
-                </span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Gross Yield</span>
-                <span className="info-value-detail">
-                  {property.gross_yield ? `${property.gross_yield}%` : 'N/A'}
-                </span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Potential Gain</span>
-                <span className="info-value-detail">
-                  {property.potential_gain ? `${property.potential_gain}%` : 'N/A'}
-                </span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Expected Return Period</span>
-                <span className="info-value-detail">
-                  {property.expected_return_period ? `${property.expected_return_period} months` : 'N/A'}
-                </span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Lock-in Period</span>
-                <span className="info-value-detail">
-                  {property.lock_in_period ? `${property.lock_in_period} months` : 'N/A'}
-                </span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Project Duration</span>
-                <span className="info-value-detail">
-                  {property.project_duration ? `${property.project_duration} months` : 'N/A'}
-                </span>
-              </div>
-            </div>
-          </div>
+          <InfoSection title="Investment Returns & Tenure" icon="chart">
+            <InfoItem 
+              label="Expected Return %" 
+              value={formatPercentage(property.expected_return_percentage)} 
+            />
+            <InfoItem 
+              label="Gross Yield" 
+              value={formatPercentage(property.gross_yield)} 
+            />
+            <InfoItem 
+              label="Potential Gain" 
+              value={formatPercentage(property.potential_gain)} 
+            />
+            <InfoItem 
+              label="Expected Return Period" 
+              value={formatMonths(property.expected_return_period)} 
+            />
+            <InfoItem 
+              label="Lock-in Period" 
+              value={formatMonths(property.lock_in_period)} 
+            />
+            <InfoItem 
+              label="Project Duration" 
+              value={formatMonths(property.project_duration)} 
+            />
+          </InfoSection>
 
           {/* Important Dates */}
-          <div className="info-section">
-            <h3>📅 Important Dates</h3>
-            <div className="info-grid-detail">
-              <div className="info-item-detail">
-                <span className="info-label-detail">Launch Date</span>
-                <span className="info-value-detail">
-                  {property.launch_date
-                    ? new Date(property.launch_date).toLocaleDateString('en-IN')
-                    : 'N/A'}
-                </span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Funding Start</span>
-                <span className="info-value-detail">
-                  {property.funding_start_date
-                    ? new Date(property.funding_start_date).toLocaleDateString('en-IN')
-                    : 'N/A'}
-                </span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Funding End</span>
-                <span className="info-value-detail">
-                  {property.funding_end_date
-                    ? new Date(property.funding_end_date).toLocaleDateString('en-IN')
-                    : 'N/A'}
-                </span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Possession Date</span>
-                <span className="info-value-detail">
-                  {property.possession_date
-                    ? new Date(property.possession_date).toLocaleDateString('en-IN')
-                    : 'N/A'}
-                </span>
-              </div>
-            </div>
-          </div>
+          <InfoSection title="📅 Important Dates">
+            <InfoItem label="Launch Date" value={formatDate(property.launch_date)} />
+            <InfoItem label="Funding Start" value={formatDate(property.funding_start_date)} />
+            <InfoItem label="Funding End" value={formatDate(property.funding_end_date)} />
+            <InfoItem label="Possession Date" value={formatDate(property.possession_date)} />
+          </InfoSection>
 
           {/* Developer Info */}
           {property.developer_details && (
-            <div className="info-section">
-              <h3>👤 Developer Information</h3>
-              <div className="info-grid-detail">
-                <div className="info-item-detail">
-                  <span className="info-label-detail">Name</span>
-                  <span className="info-value-detail">{property.developer_details.username}</span>
-                </div>
-                <div className="info-item-detail">
-                  <span className="info-label-detail">Email</span>
-                  <span className="info-value-detail">{property.developer_details.email}</span>
-                </div>
-                <div className="info-item-detail">
-                  <span className="info-label-detail">Phone</span>
-                  <span className="info-value-detail">{property.developer_details.phone || 'N/A'}</span>
-                </div>
-              </div>
-            </div>
+            <InfoSection title="👤 Developer Information">
+              <InfoItem label="Name" value={property.developer_details.username} />
+              <InfoItem label="Email" value={property.developer_details.email} />
+              <InfoItem label="Phone" value={property.developer_details.phone} />
+            </InfoSection>
           )}
 
           {/* Investment Statistics */}
           {property.investment_stats && (
-            <div className="info-section">
-              <h3>📊 Investment Statistics</h3>
-              <div className="info-grid-detail">
-                <div className="info-item-detail">
-                  <span className="info-label-detail">Total Investments</span>
-                  <span className="info-value-detail">{property.investment_stats.total_investments}</span>
-                </div>
-                <div className="info-item-detail">
-                  <span className="info-label-detail">Unique Investors</span>
-                  <span className="info-value-detail">{property.investment_stats.unique_investors}</span>
-                </div>
-                <div className="info-item-detail">
-                  <span className="info-label-detail">Total Invested</span>
-                  <span className="info-value-detail">
-                    {formatCurrency(property.investment_stats.total_invested)}
-                  </span>
-                </div>
-                <div className="info-item-detail">
-                  <span className="info-label-detail">Average Investment</span>
-                  <span className="info-value-detail">
-                    {formatCurrency(property.investment_stats.average_investment)}
-                  </span>
-                </div>
-                <div className="info-item-detail">
-                  <span className="info-label-detail">Pending Approvals</span>
-                  <span className="info-value-detail">{property.investment_stats.pending_investments}</span>
-                </div>
-              </div>
-            </div>
+            <InfoSection title="📊 Investment Statistics">
+              <InfoItem 
+                label="Total Investments" 
+                value={property.investment_stats.total_investments} 
+              />
+              <InfoItem 
+                label="Unique Investors" 
+                value={property.investment_stats.unique_investors} 
+              />
+              <InfoItem 
+                label="Total Invested" 
+                value={formatCurrency(property.investment_stats.total_invested)} 
+              />
+              <InfoItem 
+                label="Average Investment" 
+                value={formatCurrency(property.investment_stats.average_investment)} 
+              />
+              <InfoItem 
+                label="Pending Approvals" 
+                value={property.investment_stats.pending_investments} 
+              />
+              <InfoItem 
+                label="Total Shares Purchased" 
+                value={property.investment_stats.total_units_purchased} 
+              />
+            </InfoSection>
           )}
 
-          {/* Pricing */}
-          <div className="info-section">
-            <h3>
-              <span className="section-icon">{renderIcon('money')}</span>
-              Pricing
-            </h3>
-            <div className="info-grid-detail">
-              <div className="info-item-detail">
-                <span className="info-label-detail">Price Per Unit</span>
-                <span className="info-value-detail">{formatCurrency(property.price_per_unit)}</span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Total Price</span>
-                <span className="info-value-detail">{formatCurrency(property.total_price)}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Investment Returns */}
-          <div className="info-section">
-            <h3>
-              <span className="section-icon">{renderIcon('chart')}</span>
-              Investment Returns
-            </h3>
-            <div className="info-grid-detail">
-              <div className="info-item-detail">
-                <span className="info-label-detail">Expected IRR</span>
-                <span className="info-value-detail">
-                  {property.expected_irr ? `${property.expected_irr}%` : 'N/A'}
-                </span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Target Hold Period</span>
-                <span className="info-value-detail">
-                  {property.target_hold_period ? `${property.target_hold_period} months` : 'N/A'}
-                </span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Potential Gain</span>
-                <span className="info-value-detail">
-                  {property.potential_gain ? `${property.potential_gain}%` : 'N/A'}
-                </span>
-              </div>
-            </div>
-          </div>
-
           {/* Timestamps */}
-          <div className="info-section">
-            <h3>Activity</h3>
-            <div className="info-grid-detail">
-              <div className="info-item-detail">
-                <span className="info-label-detail">Created On</span>
-                <span className="info-value-detail">
-                  {new Date(property.created_at).toLocaleString('en-IN')}
-                </span>
-              </div>
-              <div className="info-item-detail">
-                <span className="info-label-detail">Last Updated</span>
-                <span className="info-value-detail">
-                  {new Date(property.updated_at).toLocaleString('en-IN')}
-                </span>
-              </div>
-              {property.published_at && (
-                <div className="info-item-detail">
-                  <span className="info-label-detail">Published On</span>
-                  <span className="info-value-detail">
-                    {new Date(property.published_at).toLocaleString('en-IN')}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
+          <InfoSection title="⏰ Activity">
+            <InfoItem label="Created On" value={formatDateTime(property.created_at)} />
+            <InfoItem label="Last Updated" value={formatDateTime(property.updated_at)} />
+            {property.approved_at && (
+              <InfoItem label="Approved On" value={formatDateTime(property.approved_at)} />
+            )}
+          </InfoSection>
         </div>
       </div>
 
-       {/* Image Gallery */}
+      {/* Image Gallery */}
       <PropertyImageGallery 
         propertyId={propertyId}
         images={images}
@@ -646,12 +556,11 @@ const refreshUnits = async () => {
       />
 
       {/* Units */}
-      <PropertyUnits 
+      {/* <PropertyUnits 
         propertyId={propertyId}
         units={units}
         onUnitsUpdate={refreshUnits}
-      />
-
+      /> */}
 
       {/* Action Modal */}
       <ActionModal

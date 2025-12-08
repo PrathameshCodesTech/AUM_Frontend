@@ -6,7 +6,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiUsers, FiDollarSign, FiTrendingUp, FiClipboard, FiHome, FiMail, FiEye } from 'react-icons/fi';
+import { FiUsers, FiTrendingUp, FiClipboard, FiHome, FiMail, FiEye } from 'react-icons/fi';
 import CPHeader from '../../components/cp/CPHeader';
 import CPStatsCard from '../../components/cp/CPStatsCard';
 import cpService from '../../services/cpService';
@@ -104,7 +104,7 @@ const CPDashboard = () => {
             onClick={() => navigate('/cp/customers')}
           />
           <CPStatsCard
-            icon={<FiDollarSign size={32} />}
+            icon={<span style={{ fontSize: '32px', fontWeight: 'bold' }}>₹</span>}
             label="Total Invested"
             value={formatCurrency(investments.total_value || 0)}
             color="#28a745"

@@ -61,7 +61,7 @@ const PortfolioStats = ({ data }) => {
   const stats = [
     {
       id: 'properties',
-      label: 'Properties Holding',
+      label: 'Investment Holding',
       value: data.propertiesHolding,
       icon: 'properties',
       iconColor: '#2196F3',

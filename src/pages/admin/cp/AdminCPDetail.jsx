@@ -6,24 +6,25 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  FiArrowLeft, FiEdit, FiCheckCircle, FiXCircle, 
-  FiPackage, FiUsers, FiDollarSign, FiPlus, FiTrash2 
+import {
+  FiArrowLeft, FiEdit, FiCheckCircle, FiXCircle,
+  FiPackage, FiUsers, FiDollarSign, FiPlus, FiTrash2
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import adminService from '../../../services/adminService';
 import AdminCPAuthorizeModal from '../../../pages/admin/cp/AdminCPAuthorizeModal';
+import CPCommissionsTab from '../../../components/admin/cp/CPCommissionsTab';
 import '../../../styles/admin/cp/AdminCPDetail.css';
 
 const AdminCPDetail = () => {
   const { cpId } = useParams();
   const navigate = useNavigate();
-  
+
   const [cp, setCp] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('info');
-  
+
   // Properties
   const [authorizedProperties, setAuthorizedProperties] = useState([]);
   const [loadingProperties, setLoadingProperties] = useState(false);
@@ -38,7 +39,7 @@ const AdminCPDetail = () => {
     try {
       setLoading(true);
       const response = await adminService.getCPDetail(cpId);
-      
+
       if (response.success) {
         setCp(response.data);
       } else {
@@ -56,7 +57,7 @@ const AdminCPDetail = () => {
     try {
       setLoadingProperties(true);
       const response = await adminService.getAuthorizedProperties(cpId);
-      
+
       if (response.success) {
         setAuthorizedProperties(response.results);
       }
@@ -69,13 +70,13 @@ const AdminCPDetail = () => {
 
   const handleActivateDeactivate = async () => {
     const action = cp.is_active ? 'deactivate' : 'activate';
-    
+
     if (!window.confirm(`Are you sure you want to ${action} this CP?`)) {
       return;
     }
 
     try {
-      const response = cp.is_active 
+      const response = cp.is_active
         ? await adminService.deactivateCP(cpId)
         : await adminService.activateCP(cpId);
 
@@ -97,7 +98,7 @@ const AdminCPDetail = () => {
 
     try {
       const response = await adminService.revokePropertyFromCP(cpId, propertyId);
-      
+
       if (response.success) {
         toast.success(response.message);
         fetchAuthorizedProperties();
@@ -184,7 +185,7 @@ const AdminCPDetail = () => {
                 <FiEdit size={18} />
                 Edit
               </button>
-              <button 
+              <button
                 className={`btn-toggle ${cp.is_active ? 'deactivate' : 'activate'}`}
                 onClick={handleActivateDeactivate}
               >
@@ -245,30 +246,37 @@ const AdminCPDetail = () => {
 
         {/* Tabs */}
         <div className="cp-detail-tabs">
-          <button 
+          <button
             className={`tab ${activeTab === 'info' ? 'active' : ''}`}
             onClick={() => setActiveTab('info')}
           >
             Basic Info
           </button>
-          <button 
+          <button
             className={`tab ${activeTab === 'properties' ? 'active' : ''}`}
             onClick={() => setActiveTab('properties')}
           >
             Authorized Properties ({authorizedProperties.length})
           </button>
-          <button 
+          <button
             className={`tab ${activeTab === 'bank' ? 'active' : ''}`}
             onClick={() => setActiveTab('bank')}
           >
             Bank Details
           </button>
-          <button 
+          <button
             className={`tab ${activeTab === 'documents' ? 'active' : ''}`}
             onClick={() => setActiveTab('documents')}
           >
             Documents
           </button>
+          <button
+            className={`tab ${activeTab === 'commissions' ? 'active' : ''}`}
+            onClick={() => setActiveTab('commissions')}
+          >
+            Commissions
+          </button>
+
         </div>
 
         {/* Tab Content */}
@@ -361,7 +369,7 @@ const AdminCPDetail = () => {
             <div className="properties-tab">
               <div className="properties-header">
                 <h3>Authorized Properties</h3>
-                <button 
+                <button
                   className="btn-authorize-properties"
                   onClick={() => setShowAuthorizeModal(true)}
                 >
@@ -380,7 +388,7 @@ const AdminCPDetail = () => {
                   <FiPackage size={48} color="#ccc" />
                   <h4>No Properties Authorized</h4>
                   <p>This CP doesn't have access to any properties yet.</p>
-                  <button 
+                  <button
                     className="btn-primary"
                     onClick={() => setShowAuthorizeModal(true)}
                   >
@@ -427,7 +435,7 @@ const AdminCPDetail = () => {
                             <button
                               className="btn-revoke"
                               onClick={() => handleRevokeProperty(
-                                auth.property_details?.id, 
+                                auth.property_details?.id,
                                 auth.property_details?.name
                               )}
                               title="Revoke Authorization"
@@ -487,6 +495,10 @@ const AdminCPDetail = () => {
               </div>
             </div>
           )}
+          {/* Commissions Tab */}
+          {activeTab === 'commissions' && (
+            <CPCommissionsTab cpId={cpId} cpCode={cp.cp_code} />
+          )}
         </div>
       </div>
 
@@ -500,6 +512,7 @@ const AdminCPDetail = () => {
           onSuccess={handleAuthorizeSuccess}
         />
       )}
+
     </div>
   );
 };

@@ -49,9 +49,13 @@ const CPInviteForm = ({ onSubmit, onClose }) => {
       newErrors.recipient_email = 'Invalid email address';
     }
 
-    if (formData.recipient_phone && !/^[6-9]\d{9}$/.test(formData.recipient_phone.replace(/[\s-]/g, ''))) {
-      newErrors.recipient_phone = 'Invalid phone number';
-    }
+   if (
+  formData.recipient_phone &&
+  !/^\+91[6-9]\d{9}$/.test(formData.recipient_phone.replace(/[\s-]/g, ''))
+) {
+  newErrors.recipient_phone = 'Phone must start with +91 and be valid';
+}
+
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -67,7 +71,12 @@ const CPInviteForm = ({ onSubmit, onClose }) => {
     setSubmitting(true);
 
     try {
-      await onSubmit(formData);
+       await onSubmit({
+          name: formData.recipient_name,
+          email: formData.recipient_email,
+          phone: formData.recipient_phone,
+          personal_message: formData.personal_message
+        });
     } catch (err) {
       alert('Failed to send invite');
     } finally {
