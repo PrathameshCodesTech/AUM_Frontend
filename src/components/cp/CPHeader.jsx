@@ -76,6 +76,8 @@ const CPHeader = () => {
           >
             Commissions
           </Link>
+          <Link to="/cp/permanent-invite">Referral Link</Link>
+          <Link to="/cp/invite-signups">My Signups</Link>
         </nav>
 
         <div className="cp-header-right">

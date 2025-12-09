@@ -157,7 +157,7 @@ const fetchInvestments = async () => {
                       <span className="detail-value">₹{parseFloat(investment.amount).toLocaleString('en-IN')}</span>
                     </div>
                     <div className="detail-row">
-                      <span className="detail-label">Units Purchased:</span>
+                      <span className="detail-label">Shares Purchased:</span>
                       <span className="detail-value">{investment.units_purchased}</span>
                     </div>
                     <div className="detail-row">

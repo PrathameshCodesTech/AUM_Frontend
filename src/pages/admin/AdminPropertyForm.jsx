@@ -242,24 +242,23 @@ const AdminPropertyForm = () => {
     setSubmitting(true);
 
     try {
-      const submitData = new FormData();
+        const submitData = new FormData();
 
-      Object.entries(formData).forEach(([key, value]) => {
-        if (
-          value === null ||
-          value === undefined ||
-          value === "" ||
-          (Array.isArray(value) && value.length === 0)
-        ) {
-          return;
-        }
+    Object.entries(formData).forEach(([key, value]) => {
+      if (value === null || value === undefined) return;
 
-        if (Array.isArray(value)) {
-          submitData.append(key, JSON.stringify(value));
-        } else {
-          submitData.append(key, value);
-        }
-      });
+      if (value instanceof File) {
+        submitData.append(key, value);
+        return;
+      }
+
+      if (Array.isArray(value)) {
+        value.forEach((item) => submitData.append(`${key}[]`, item));
+        return;
+      }
+
+      submitData.append(key, value);
+    });
 
       let response;
       if (isEditMode) {
@@ -800,7 +799,7 @@ const AdminPropertyForm = () => {
         </div>
 
         {/* Status & Visibility */}
-        <div className="form-section">
+        {/* <div className="form-section">
           <h3 className="section-title">Status & Visibility</h3>
           <div className="form-grid">
             <div className="form-group">
@@ -870,7 +869,7 @@ const AdminPropertyForm = () => {
               </label>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Actions */}
         <div className="form-actions">

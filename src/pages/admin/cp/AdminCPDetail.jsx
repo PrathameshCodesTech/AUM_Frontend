@@ -30,6 +30,11 @@ const AdminCPDetail = () => {
   const [loadingProperties, setLoadingProperties] = useState(false);
   const [showAuthorizeModal, setShowAuthorizeModal] = useState(false);
 
+
+  const [creatingInvite, setCreatingInvite] = useState(false);
+  const [hasPermanentInvite, setHasPermanentInvite] = useState(false);
+  const [inviteData, setInviteData] = useState(null);
+
   useEffect(() => {
     fetchCPDetail();
     fetchAuthorizedProperties();
@@ -90,6 +95,37 @@ const AdminCPDetail = () => {
       toast.error(`Failed to ${action} CP`);
     }
   };
+
+  const handleCreatePermanentInvite = async () => {
+    if (!window.confirm('Create a permanent referral link for this CP?')) {
+      return;
+    }
+
+    try {
+      setCreatingInvite(true);
+      const response = await adminService.createPermanentInvite(cpId);
+
+      if (response.success) {
+        toast.success('✅ Permanent invite created successfully!');
+        setHasPermanentInvite(true);
+        setInviteData(response.data);
+      }
+    } catch (error) {
+      if (error.error) {
+        toast.error(error.error);
+        // If already exists, show the existing invite
+        if (error.data) {
+          setHasPermanentInvite(true);
+          setInviteData(error.data);
+        }
+      } else {
+        toast.error('Failed to create permanent invite');
+      }
+    } finally {
+      setCreatingInvite(false);
+    }
+  };
+
 
   const handleRevokeProperty = async (propertyId, propertyName) => {
     if (!window.confirm(`Revoke authorization for "${propertyName}"?`)) {
@@ -192,6 +228,17 @@ const AdminCPDetail = () => {
                 {cp.is_active ? <FiXCircle size={18} /> : <FiCheckCircle size={18} />}
                 {cp.is_active ? 'Deactivate' : 'Activate'}
               </button>
+
+
+              {/* 🆕 ADD THIS BUTTON */}
+              <button
+                className="btn-create-invite"
+                onClick={handleCreatePermanentInvite}
+                disabled={creatingInvite || hasPermanentInvite}
+              >
+                <FiPlus size={18} />
+                {creatingInvite ? 'Creating...' : hasPermanentInvite ? 'Invite Exists' : 'Create Permanent Invite'}
+              </button>
             </div>
           </div>
         </div>
@@ -243,6 +290,46 @@ const AdminCPDetail = () => {
             </div>
           </div>
         </div>
+
+        {/* Permanent Invite Info */}
+        {inviteData && (
+          <div className="permanent-invite-info-card">
+            <div className="invite-header">
+              <h3>🔗 Permanent Referral Link</h3>
+              <span className="invite-badge">Active</span>
+            </div>
+            <div className="invite-details">
+              <div className="invite-field">
+                <label>Invite Code:</label>
+                <code className="invite-code">{inviteData.invite_code}</code>
+              </div>
+              <div className="invite-field">
+                <label>Referral Link:</label>
+                <div className="invite-link-container">
+                  <input
+                    type="text"
+                    value={inviteData.invite_link}
+                    readOnly
+                    className="invite-link-input"
+                  />
+                  <button
+                    className="btn-copy-link"
+                    onClick={() => {
+                      navigator.clipboard.writeText(inviteData.invite_link);
+                      toast.success('Link copied to clipboard!');
+                    }}
+                  >
+                    Copy Link
+                  </button>
+                </div>
+              </div>
+            </div>
+            <p className="invite-note">
+              💡 This link can be used by unlimited users and never expires.
+              CP can share this link to refer customers.
+            </p>
+          </div>
+        )}
 
         {/* Tabs */}
         <div className="cp-detail-tabs">

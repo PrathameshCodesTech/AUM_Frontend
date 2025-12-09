@@ -18,6 +18,9 @@ import CPLeads from '../pages/cp/CPLeads';
 import CPInvites from '../pages/cp/CPInvites';
 import CPCommissions from '../pages/cp/CPCommissions';
 import CPProfile from '../pages/cp/CPProfile';
+import CPPermanentInvite from '../pages/cp/CPPermanentInvite';
+import CPInviteSignups from '../pages/cp/CPInviteSignups';
+
 
 // Loading Component
 const LoadingState = () => (
@@ -204,6 +207,8 @@ const CPRoutes = () => {
           </CPProtectedRoute>
         }
       />
+      <Route path="permanent-invite" element={<CPPermanentInvite />} />
+      <Route path="invite-signups" element={<CPInviteSignups />} />
 
       {/* Default redirect - Intelligent based on status */}
       <Route path="/" element={<Navigate to="/cp/dashboard" replace />} />

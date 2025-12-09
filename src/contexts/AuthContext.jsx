@@ -35,31 +35,33 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Login function with role-based navigation
-  const login = async (phoneNumber, otp) => {
-    try {
-      const response = await authService.verifyOTP(phoneNumber, otp);
-      
-      // Fetch user data after login
-      const userData = await authService.getCurrentUser();
-     
+// Login function with role-based navigation
+const login = async (phoneNumber, otp, inviteCode = null) => { // ← ADD PARAMETER
+  try {
+    // ✅ Pass invite code to verifyOTP
+    const response = await authService.verifyOTP(phoneNumber, otp, inviteCode);
     
-    // 👇 ADD THESE DEBUG LOGS
-    console.log('🔍 USER DATA FROM API:', userData);
-    console.log('🔍 is_cp:', userData.is_cp);
-    console.log('🔍 cp_status:', userData.cp_status);
-    console.log('🔍 is_active_cp:', userData.is_active_cp);
-    console.log('🔍 role:', userData.role);
-      setUser(userData);
-      setIsAuthenticated(true);
-      
-      // Role-based navigation
-      navigateByRole(userData);
-      
-      return response;
-    } catch (error) {
-      throw error;
-    }
-  };
+    // Fetch user data after login
+    const userData = await authService.getCurrentUser();
+   
+  
+  // 👇 ADD THESE DEBUG LOGS
+  console.log('🔍 USER DATA FROM API:', userData);
+  console.log('🔍 is_cp:', userData.is_cp);
+  console.log('🔍 cp_status:', userData.cp_status);
+  console.log('🔍 is_active_cp:', userData.is_active_cp);
+  console.log('🔍 role:', userData.role);
+    setUser(userData);
+    setIsAuthenticated(true);
+    
+    // Role-based navigation
+    navigateByRole(userData);
+    
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
 
   // Navigate based on user role
   // Navigate based on user role

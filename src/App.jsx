@@ -66,6 +66,7 @@ function App() {
                 ======================================== */}
             <Route path="/" element={<Navigate to="/login" replace />} />
             <Route path="/login" element={<LoginSignup />} />
+            <Route path="/signup" element={<LoginSignup />} /> {/* ← ADD THIS */}
 
             {/* ========================================
                 USER ROUTES - With Header/Footer

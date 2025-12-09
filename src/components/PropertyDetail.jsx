@@ -29,6 +29,29 @@ const PropertyDetail = () => {
   const [referralCode, setReferralCode] = useState('');
   const [validatingCode, setValidatingCode] = useState(false);
   const [codeValidation, setCodeValidation] = useState(null); // { valid: true/false, message: '', cp_name: '' }
+  const [userCPRelation, setUserCPRelation] = useState(null); // ← NEW
+  const [checkingCPRelation, setCheckingCPRelation] = useState(true); // ← NEW
+
+  // ✅ Check if user has CP relation
+  useEffect(() => {
+    if (isAuthenticated) {
+      checkUserCPRelation();
+    }
+  }, [isAuthenticated]);
+
+  const checkUserCPRelation = async () => {
+    try {
+      const response = await investmentService.checkCPRelation();
+      if (response.success && response.has_cp_relation) {
+        setUserCPRelation(response.cp_details);
+        toast.info(`You're linked to ${response.cp_details.cp_name} (${response.cp_details.cp_code})`);
+      }
+    } catch (error) {
+      console.error('Error checking CP relation:', error);
+    } finally {
+      setCheckingCPRelation(false);
+    }
+  };
 
   useEffect(() => {
     fetchPropertyDetail();
@@ -99,34 +122,35 @@ const PropertyDetail = () => {
   };
 
   const handleInvestmentSubmit = async () => {
-    if (!investmentAmount || parseFloat(investmentAmount) < parseFloat(property.minimum_investment)) {
-      toast.error(`Minimum investment is ${formatCurrency(property.minimum_investment)}`);
-      return;
-    }
+  if (!investmentAmount || parseFloat(investmentAmount) < parseFloat(property.minimum_investment)) {
+    toast.error(`Minimum investment is ${formatCurrency(property.minimum_investment)}`);
+    return;
+  }
 
-    if (parseFloat(investmentAmount) > walletBalance) {
-      toast.error('Insufficient wallet balance. Please add funds first.');
-      navigate('/wallet');
-      return;
-    }
+  if (parseFloat(investmentAmount) > walletBalance) {
+    toast.error('Insufficient wallet balance. Please add funds first.');
+    navigate('/wallet');
+    return;
+  }
 
-    setInvesting(true);
-    try {
-      const referralCodeToSend = referralCode.trim() || null;
+  setInvesting(true);
+  try {
+    // ✅ Only send referral_code if it has a value
+    const referralCodeToSend = referralCode.trim() || undefined; // ← CHANGED: null → undefined
 
-      console.log('🔍 Sending to backend:', {
-        property_id: property.id,
-        amount: investmentAmount,
-        units_count: unitsCount,
-        referral_code: referralCodeToSend
-      });
+    console.log('🔍 Sending to backend:', {
+      property_id: property.id,
+      amount: investmentAmount,
+      units_count: unitsCount,
+      referral_code: referralCodeToSend || '(not provided)'
+    });
 
-      const response = await investmentService.createInvestment(
-        property.id,
-        investmentAmount,
-        unitsCount,
-        referralCode.trim() || null  // Always send if entered, backend validates
-      );
+    const response = await investmentService.createInvestment(
+      property.id,
+      investmentAmount,
+      unitsCount,
+      referralCodeToSend  // ← CHANGED: Pass undefined instead of null
+    );
       if (response.success) {
         toast.success(response.message);
         setShowInvestModal(false);
@@ -409,11 +433,11 @@ const PropertyDetail = () => {
                         <span className="spec-value">{property.total_area} sq ft</span>
                       </div>
                       <div className="spec-item">
-                        <span className="spec-label">Total Units</span>
+                        <span className="spec-label">Total Shares</span>
                         <span className="spec-value">{property.total_units}</span>
                       </div>
                       <div className="spec-item">
-                        <span className="spec-label">Available Units</span>
+                        <span className="spec-label">Available Shares</span>
                         <span className="spec-value">{property.available_units}</span>
                       </div>
                       <div className="spec-item">
@@ -701,11 +725,11 @@ const PropertyDetail = () => {
 
               <div className="metrics-section">
                 <div className="metric-row">
-                  <span className="metric-label">Total Units</span>
+                  <span className="metric-label">Total Shares</span>
                   <span className="metric-value">{property.total_units}</span>
                 </div>
                 <div className="metric-row">
-                  <span className="metric-label">Available Units</span>
+                  <span className="metric-label">Available Shares</span>
                   <span className="metric-value">{property.available_units}</span>
                 </div>
                 <div className="metric-row">
@@ -843,37 +867,55 @@ const PropertyDetail = () => {
                 <span className="input-hint">Min: {formatCurrency(property.minimum_investment)}</span>
               </div>
 
-              <div className="input-group">
-                <label>Referred by</label>
-                <div className="referral-input-wrapper">
-                  <input
-                    type="text"
-                    value={referralCode}
-                    onChange={(e) => {
-                      let value = e.target.value.toUpperCase().trim();
-                      // Auto-add CP prefix if not present
-                      if (value && !value.startsWith('CP')) {
-                        value = 'CP' + value;
-                      }
-                      setReferralCode(value);
-                    }}
-                    onBlur={() => validateReferralCode(referralCode)}
-                    placeholder="Enter CP referral code"
-                    maxLength={10}
-                  />
-                  {validatingCode && <span className="validating">Checking...</span>}
-                </div>
+              {/* ✅ CONDITIONAL: Only show if user does NOT have CP relation */}
+              {!checkingCPRelation && (
+                userCPRelation ? (
+                  // User already has CP - show info message
+                  <div className="input-group">
+                    <label>Referred by</label>
+                    <div className="cp-linked-message">
+                      <div className="cp-linked-icon">✓</div>
+                      <div className="cp-linked-content">
+                        <strong>{userCPRelation.cp_name}</strong>
+                        <span className="cp-code-badge">{userCPRelation.cp_code}</span>
+                        <p className="cp-linked-note">You're already linked to this Channel Partner</p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  // User does NOT have CP - show input field
+                  <div className="input-group">
+                    <label>Referred by (Optional)</label>
+                    <div className="referral-input-wrapper">
+                      <input
+                        type="text"
+                        value={referralCode}
+                        onChange={(e) => {
+                          let value = e.target.value.toUpperCase().trim();
+                          if (value && !value.startsWith('CP')) {
+                            value = 'CP' + value;
+                          }
+                          setReferralCode(value);
+                        }}
+                        onBlur={() => validateReferralCode(referralCode)}
+                        placeholder="Enter CP referral code"
+                        maxLength={10}
+                      />
+                      {validatingCode && <span className="validating">Checking...</span>}
+                    </div>
 
-                {codeValidation && (
-                  <span className={`validation-message ${codeValidation.valid ? 'valid' : 'invalid'}`}>
-                    {codeValidation.valid && '✓ '}
-                    {codeValidation.message}
-                    {codeValidation.cp_name && ` - ${codeValidation.cp_name}`}
-                  </span>
-                )}
+                    {codeValidation && (
+                      <span className={`validation-message ${codeValidation.valid ? 'valid' : 'invalid'}`}>
+                        {codeValidation.valid && '✓ '}
+                        {codeValidation.message}
+                        {codeValidation.cp_name && ` - ${codeValidation.cp_name}`}
+                      </span>
+                    )}
 
-                <span className="input-hint">Have a Channel Partner code? Enter it here</span>
-              </div>
+                    <span className="input-hint">Have a Channel Partner code? Enter it here</span>
+                  </div>
+                )
+              )}
             </div>
 
             <div className="invest-summary">
@@ -882,7 +924,7 @@ const PropertyDetail = () => {
                 <strong>{formatCurrency(property.price_per_unit)}</strong>
               </div>
               <div className="summary-row">
-                <span>Units</span>
+                <span>Shares</span>
                 <strong>{unitsCount}</strong>
               </div>
               <div className="summary-row total">

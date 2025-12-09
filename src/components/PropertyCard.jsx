@@ -179,7 +179,7 @@ const PropertyCard = ({ property }) => {
 
           <div className="property-metrics">
             <div className="metric">
-              <span className="metric-label">Tokens</span>
+              <span className="metric-label">Shares</span>
               <span className="metric-value">{property.total_units || 0}</span>
             </div>
             <div className="metric">

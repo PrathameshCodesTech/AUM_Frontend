@@ -24,24 +24,32 @@ const authService = {
   },
 
   // Verify OTP
-  verifyOTP: async (phoneNumber, otp) => {
-    try {
-      const response = await api.post('/auth/verify-otp/', {
-        phone: phoneNumber,
-        otp: otp,
-      });
-      
-      // Store tokens if verification successful
-      if (response.data.access) {
-        localStorage.setItem('access_token', response.data.access);
-        localStorage.setItem('refresh_token', response.data.refresh);
-      }
-      
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { error: 'Invalid OTP' };
+// Verify OTP
+verifyOTP: async (phoneNumber, otp, inviteCode = null) => {
+  try {
+    const payload = {
+      phone: phoneNumber,
+      otp: otp,
+    };
+    
+    // ✅ Add invite_code if provided
+    if (inviteCode) {
+      payload.invite_code = inviteCode;
     }
-  },
+    
+    const response = await api.post('/auth/verify-otp/', payload);
+    
+    // Store tokens if verification successful
+    if (response.data.access) {
+      localStorage.setItem('access_token', response.data.access);
+      localStorage.setItem('refresh_token', response.data.refresh);
+    }
+    
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: 'Invalid OTP' };
+  }
+},
 
   // Complete registration (after OTP verification for new users)
   completeRegistration: async (phoneNumber, name, email) => {

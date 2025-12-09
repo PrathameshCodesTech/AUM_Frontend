@@ -587,6 +587,34 @@ bulkPayoutCommissions: async (commissionIds, paymentReference) => {
     throw error.response?.data || error;
   }
 },
+
+
+  createPermanentInvite: async (cpId) => {
+    try {
+      const response = await api.post(`/admin/cp/${cpId}/create-permanent-invite/`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { error: 'Failed to create permanent invite' };
+    }
+  },
+
+  // Update property status and visibility
+  updatePropertyStatus: async (propertyId, statusData) => {
+    try {
+      const response = await api.put(
+        `/admin/properties/${propertyId}/update/`,
+        statusData
+      );
+      return {
+        success: true,
+        data: response.data.data || response.data,
+        message: response.data.message || 'Status updated successfully'
+      };
+    } catch (error) {
+      console.error('❌ Error updating property status:', error);
+      throw error.response?.data || { message: 'Failed to update property status' };
+    }
+  },
 };
 
 export default adminService;
