@@ -1,0 +1,151 @@
+/* Investment Workflow Progress */
+.investment-workflow {
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 32px;
+}
+
+.workflow-steps {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.workflow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.step-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.4);
+  transition: all 0.3s ease;
+}
+
+.workflow-step.completed .step-icon {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: #667eea;
+  color: white;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+}
+
+.workflow-step.current .step-icon {
+  background: rgba(102, 126, 234, 0.15);
+  border-color: #667eea;
+  color: #667eea;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
+  }
+}
+
+.step-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.step-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.3s ease;
+}
+
+.workflow-step.completed .step-label,
+.workflow-step.current .step-label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.step-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #10b981;
+  padding: 4px 12px;
+  background: rgba(16, 185, 129, 0.1);
+  border-radius: 12px;
+}
+
+.step-status.pending {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.step-status svg {
+  flex-shrink: 0;
+}
+
+/* Connector Line */
+.workflow-connector {
+  position: absolute;
+  top: 28px;
+  left: calc(25% - 28px);
+  right: calc(75% - 28px);
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  transition: background 0.3s ease;
+  z-index: 0;
+}
+
+.workflow-connector.completed {
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .investment-workflow {
+    padding: 24px 16px;
+  }
+  
+  .workflow-steps {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .workflow-step {
+    flex-direction: row;
+    width: 100%;
+  }
+  
+  .step-content {
+    align-items: flex-start;
+    text-align: left;
+    flex: 1;
+  }
+  
+  .step-icon {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .workflow-connector {
+    display: none;
+  }
+}

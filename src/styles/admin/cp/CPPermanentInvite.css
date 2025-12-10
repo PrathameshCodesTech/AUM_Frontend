@@ -36,7 +36,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, black 0%, gray 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -105,7 +105,7 @@
   font-weight: 700;
   color: white;
   padding: 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, black 0%, gray 100%);
   border-radius: 12px;
   text-align: center;
   letter-spacing: 2px;
@@ -133,7 +133,7 @@
   align-items: center;
   gap: 8px;
   padding: 14px 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, black 0%, gray 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -254,7 +254,7 @@
   font-size: 28px;
 }
 
-.permanent-stat-icon.signups {
+/* .permanent-stat-icon.signups {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
 }
 
@@ -268,7 +268,7 @@
 
 .permanent-stat-icon.commission {
   background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-}
+} */
 
 .permanent-stat-content {
   flex: 1;
@@ -307,7 +307,7 @@
 
 /* Tip */
 .permanent-invite-tip {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  background: linear-gradient(135deg, black 0%, gray 100%);
   border-radius: 12px;
   padding: 20px;
   display: flex;
@@ -315,20 +315,26 @@
   align-items: flex-start;
 }
 
-.tip-icon-permanent {
+/* .tip-icon-permanent {
   font-size: 32px;
+  
+} */
+ .tip-icon-permanent svg {
+  font-size: 28px;
+  color: #f4c542; /* warm yellow */
 }
+
 
 .tip-content-permanent h4 {
   font-size: 16px;
   font-weight: 600;
-  color: #78350f;
+  color: white;
   margin-bottom: 8px;
 }
 
 .tip-content-permanent p {
   font-size: 14px;
-  color: #92400e;
+  color: white;
   line-height: 1.6;
   margin: 0;
 }
@@ -371,7 +377,7 @@
 .email-invite-section {
   margin-top: 32px;
   padding: 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, black 0%, gray 100%);
   border-radius: 12px;
   color: white;
 }

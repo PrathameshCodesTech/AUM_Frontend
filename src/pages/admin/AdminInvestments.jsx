@@ -38,26 +38,26 @@ const AdminInvestments = () => {
     fetchStats();
   }, [filters]);
 
-const fetchInvestments = async () => {
-  setLoading(true);
-  try {
-    const response = await adminService.getInvestments(filters);
-    
-    console.log('📦 Investments Response:', response); // 👈 For debugging
-    
-    if (response.success && response.results) {
-      setInvestments(response.results);
-    } else {
-      console.warn('⚠️ Unexpected response format:', response);
-      setInvestments([]);
+  const fetchInvestments = async () => {
+    setLoading(true);
+    try {
+      const response = await adminService.getInvestments(filters);
+      
+      console.log('📦 Investments Response:', response);
+      
+      if (response.success && response.results) {
+        setInvestments(response.results);
+      } else {
+        console.warn('⚠️ Unexpected response format:', response);
+        setInvestments([]);
+      }
+    } catch (error) {
+      console.error('❌ Error fetching investments:', error);
+      toast.error('Failed to load investments');
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error('❌ Error fetching investments:', error);
-    toast.error('Failed to load investments');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const fetchStats = async () => {
     setStatsLoading(true);
@@ -80,9 +80,19 @@ const fetchInvestments = async () => {
 
   const openActionModal = (investment, action) => {
     const modalConfig = {
+      approve_payment: {
+        title: 'Approve Payment',
+        message: `Approve payment for investment #${investment.investment_id}? This will verify the payment proof.`,
+        requireReason: false
+      },
+      reject_payment: {
+        title: 'Reject Payment',
+        message: `Reject payment for investment #${investment.investment_id}? User will be notified.`,
+        requireReason: true
+      },
       approve: {
         title: 'Approve Investment',
-        message: `Are you sure you want to approve investment #${investment.investment_id} by ${investment.customer?.username}? Units will be allocated and funds deducted.`,
+        message: `Approve investment #${investment.investment_id}? Units will be deducted and commission calculated.`,
         requireReason: false
       },
       reject: {
@@ -106,7 +116,7 @@ const fetchInvestments = async () => {
       isOpen: true,
       investmentId: investment.id,
       action,
-      userName: investment.customer?.username || 'User',
+      userName: investment.customer_name || 'User',
       ...modalConfig[action]
     });
   };
@@ -123,8 +133,8 @@ const fetchInvestments = async () => {
 
       if (response.success) {
         toast.success(response.message);
-        fetchInvestments(); // Refresh list
-        fetchStats(); // Refresh stats
+        fetchInvestments();
+        fetchStats();
         setActionModal({ ...actionModal, isOpen: false });
       }
     } catch (error) {
@@ -172,79 +182,154 @@ const fetchInvestments = async () => {
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
           <path d="M9 11L12 14L22 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
         </svg>
+      ),
+      clock: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+          <path d="M12 6V12L16 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        </svg>
+      ),
+      creditCard: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="2"/>
+          <path d="M2 10H22" stroke="currentColor" strokeWidth="2"/>
+        </svg>
+      ),
+      phone: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <rect x="5" y="2" width="14" height="20" rx="2" stroke="currentColor" strokeWidth="2"/>
+          <path d="M12 18H12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        </svg>
+      ),
+      document: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2"/>
+          <path d="M14 2V8H20" stroke="currentColor" strokeWidth="2"/>
+        </svg>
+      ),
+      bank: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" strokeWidth="2"/>
+          <path d="M9 22V12H15V22" stroke="currentColor" strokeWidth="2"/>
+        </svg>
+      ),
+      approve: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.7088 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4881 2.02168 11.3363C2.16356 9.18455 2.99721 7.13631 4.39828 5.49706C5.79935 3.85781 7.69279 2.71537 9.79619 2.24013C11.8996 1.7649 14.1003 1.98232 16.07 2.85999" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        </svg>
+      ),
+      reject: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+          <path d="M15 9L9 15M9 9L15 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+        </svg>
       )
     };
     return icons[iconName] || null;
   };
 
+  // Get payment method icon
+  const getPaymentMethodIcon = (method) => {
+    switch(method) {
+      case 'ONLINE':
+        return renderIcon('creditCard');
+      case 'POS':
+        return renderIcon('phone');
+      case 'DRAFT_CHEQUE':
+        return renderIcon('document');
+      case 'NEFT_RTGS':
+        return renderIcon('bank');
+      default:
+        return null;
+    }
+  };
+
   const columns = [
-  {
-    key: 'investment_id',
-    label: 'Investment ID',
-    sortable: true,
-    render: (value) => <strong>#{value}</strong>
-  },
-  {
-    key: 'customer_name', // ✅ Changed from 'customer' to 'customer_name'
-    label: 'Customer',
-    sortable: false,
-    render: (value, row) => (
-      <div className="user-cell">
-        <div className="user-avatar-small">
-          {value?.charAt(0).toUpperCase()}
+    {
+      key: 'investment_id',
+      label: 'Investment ID',
+      sortable: true,
+      render: (value) => <strong>#{value}</strong>
+    },
+    {
+      key: 'customer_name',
+      label: 'Customer',
+      sortable: false,
+      render: (value, row) => (
+        <div className="user-cell">
+          <div className="user-avatar-small">
+            {value?.charAt(0).toUpperCase()}
+          </div>
+          <div className="user-info">
+            <strong>{value || 'N/A'}</strong>
+            <span className="user-email">{row.customer_email || ''}</span>
+          </div>
         </div>
-        <div className="user-info">
-          <strong>{value || 'N/A'}</strong>
-          <span className="user-email">{row.customer_email || ''}</span>
+      )
+    },
+    {
+      key: 'property_name',
+      label: 'Property',
+      sortable: false,
+      render: (value) => value || 'N/A'
+    },
+    {
+      key: 'amount',
+      label: 'Amount',
+      sortable: true,
+      render: (value) => <strong>{formatCurrency(value)}</strong>
+    },
+    {
+      key: 'units_purchased',
+      label: 'Units',
+      sortable: true
+    },
+    {
+      key: 'payment_method',
+      label: 'Payment',
+      sortable: false,
+      render: (value, row) => {
+        if (!value) return <span className="text-muted">-</span>;
+        return (
+          <div className="payment-method-cell">
+            <span className="payment-method-icon">
+              {getPaymentMethodIcon(value)}
+            </span>
+            <span className="payment-method-text">
+              {row.payment_method_display || value}
+            </span>
+          </div>
+        );
+      }
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      sortable: true,
+      render: (value, row) => (
+        <div className="status-cell">
+          <StatusBadge status={value} />
+          {row.payment_status && (
+            <StatusBadge 
+              status={row.payment_status.toLowerCase()} 
+              label={row.payment_status} 
+            />
+          )}
         </div>
-      </div>
-    )
-  },
-  {
-    key: 'property_name', // ✅ Changed from 'property' to 'property_name'
-    label: 'Property',
-    sortable: false,
-    render: (value) => value || 'N/A'
-  },
-  {
-    key: 'amount',
-    label: 'Amount',
-    sortable: true,
-    render: (value) => <strong>{formatCurrency(value)}</strong>
-  },
-  {
-    key: 'units_purchased',
-    label: 'Units',
-    sortable: true
-  },
-  {
-    key: 'status',
-    label: 'Status',
-    sortable: true,
-    render: (value) => <StatusBadge status={value} />
-  },
-  {
-    key: 'payment_completed',
-    label: 'Payment',
-    sortable: true,
-    render: (value) => (
-      <StatusBadge 
-        status={value ? 'completed' : 'pending'} 
-        label={value ? 'Completed' : 'Pending'}
-      />
-    )
-  },
-  {
-    key: 'created_at',
-    label: 'Date',
-    sortable: true,
-    render: (value) => new Date(value).toLocaleDateString('en-IN', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
-    })
-  }
-];
+      )
+    },
+    {
+      key: 'created_at',
+      label: 'Date',
+      sortable: true,
+      render: (value) => new Date(value).toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      })
+    }
+  ];
 
   const renderActions = (investment) => (
     <div className="table-actions">
@@ -259,7 +344,34 @@ const fetchInvestments = async () => {
         {renderIcon('view')}
       </button>
 
-      {investment.status === 'pending' && (
+      {/* PAYMENT APPROVAL (pending_payment status) */}
+      {investment.status === 'pending_payment' && (
+        <>
+          <button
+            className="btn-action btn-approve"
+            onClick={(e) => {
+              e.stopPropagation();
+              openActionModal(investment, 'approve_payment');
+            }}
+            title="Approve Payment"
+          >
+            {renderIcon('approve')}
+          </button>
+          <button
+            className="btn-action btn-reject"
+            onClick={(e) => {
+              e.stopPropagation();
+              openActionModal(investment, 'reject_payment');
+            }}
+            title="Reject Payment"
+          >
+            {renderIcon('reject')}
+          </button>
+        </>
+      )}
+
+      {/* INVESTMENT APPROVAL (payment_approved status) */}
+      {investment.status === 'payment_approved' && (
         <>
           <button
             className="btn-action btn-approve"
@@ -269,7 +381,7 @@ const fetchInvestments = async () => {
             }}
             title="Approve Investment"
           >
-            ✓
+            {renderIcon('approve')}
           </button>
           <button
             className="btn-action btn-reject"
@@ -279,7 +391,7 @@ const fetchInvestments = async () => {
             }}
             title="Reject Investment"
           >
-            ✗
+            {renderIcon('reject')}
           </button>
         </>
       )}
@@ -293,7 +405,7 @@ const fetchInvestments = async () => {
           }}
           title="Mark as Completed"
         >
-          ✓
+          {renderIcon('check')}
         </button>
       )}
     </div>
@@ -326,14 +438,14 @@ const fetchInvestments = async () => {
             </div>
           </div>
           <div className="stat-card-investment">
-            <span className="stat-icon-invest" style={{ color: '#ff9800' }}>{renderIcon('trending')}</span>
+            <span className="stat-icon-invest stat-icon-warning">{renderIcon('clock')}</span>
             <div className="stat-content-invest">
               <span className="stat-label-invest">Pending</span>
               <span className="stat-value-invest">{stats.pending_investments || 0}</span>
             </div>
           </div>
           <div className="stat-card-investment">
-            <span className="stat-icon-invest" style={{ color: '#28a745' }}>{renderIcon('check')}</span>
+            <span className="stat-icon-invest stat-icon-success">{renderIcon('check')}</span>
             <div className="stat-content-invest">
               <span className="stat-label-invest">Approved</span>
               <span className="stat-value-invest">{stats.approved_investments || 0}</span>
@@ -361,7 +473,10 @@ const fetchInvestments = async () => {
             className="filter-select"
           >
             <option value="">All Status</option>
-            <option value="pending">Pending</option>
+            <option value="pending_payment">Pending Payment</option>
+            <option value="payment_approved">Payment Approved</option>
+            <option value="payment_rejected">Payment Rejected</option>
+            <option value="pending">Pending Approval</option>
             <option value="approved">Approved</option>
             <option value="rejected">Rejected</option>
             <option value="cancelled">Cancelled</option>
@@ -416,13 +531,17 @@ const fetchInvestments = async () => {
         requireReason={actionModal.requireReason}
         loading={actionLoading}
         confirmText={
-          actionModal.action === 'approve' ? 'Approve' :
+          actionModal.action === 'approve_payment' ? 'Approve Payment' :
+          actionModal.action === 'reject_payment' ? 'Reject Payment' :
+          actionModal.action === 'approve' ? 'Approve Investment' :
           actionModal.action === 'reject' ? 'Reject' :
           actionModal.action === 'complete' ? 'Mark Complete' :
           'Cancel Investment'
         }
         confirmColor={
+          actionModal.action === 'approve_payment' ? '#28a745' :
           actionModal.action === 'approve' ? '#28a745' :
+          actionModal.action === 'reject_payment' ? '#dc3545' :
           actionModal.action === 'reject' ? '#dc3545' :
           actionModal.action === 'complete' ? '#28a745' :
           '#ff9800'

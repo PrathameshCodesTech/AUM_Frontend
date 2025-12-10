@@ -1,102 +1,93 @@
 /* CPPropertyCard.css */
-/* ===================================================== */
-/* CP Property Card Component - Improved Version */
-/* ===================================================== */
-
 .cp-property-card {
   background: white;
-  border: 2px solid #e0e0e0;
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  position: relative;
+  height: 100%;
 }
 
 .cp-property-card:hover {
-  border-color: #000000;
-  transform: translateY(-6px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
-/* Property Image */
-.property-image {
+/* Image Wrapper */
+.property-image-wrapper {
   position: relative;
   width: 100%;
   height: 220px;
   overflow: hidden;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8edf2 100%);
 }
 
-.property-image img {
+.property-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  object-position: center;
+  transition: transform 0.3s ease;
 }
 
-.cp-property-card:hover .property-image img {
-  transform: scale(1.08);
+.cp-property-card:hover .property-image {
+  transform: scale(1.05);
 }
 
-.property-image-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  color: #cccccc;
-  font-size: 3rem;
-}
-
-.status-badge-prop {
+/* Badges */
+.status-badge {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  font-weight: 700;
+  top: 12px;
+  right: 12px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   background: rgba(255, 255, 255, 0.95);
-  color: #1a1a1a;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #1f2937;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.status-badge-prop.available {
-  background: rgba(40, 167, 69, 0.95);
+.status-badge.approved {
+  background: #10b981;
   color: white;
 }
 
-.status-badge-prop.sold_out {
-  background: rgba(220, 53, 69, 0.95);
+.status-badge.pending {
+  background: #f59e0b;
   color: white;
 }
 
-.status-badge-prop.upcoming {
-  background: rgba(0, 123, 255, 0.95);
+.image-count-badge {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  background: rgba(0, 0, 0, 0.7);
   color: white;
+  backdrop-filter: blur(4px);
 }
 
-/* Property Details */
-.property-details {
-  padding: 1.75rem;
+/* Property Content */
+.property-content {
+  padding: 20px;
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 12px;
 }
 
 .property-title {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #1a1a1a;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
   margin: 0;
   line-height: 1.4;
   display: -webkit-box;
@@ -105,320 +96,142 @@
   overflow: hidden;
 }
 
-.property-meta {
+.property-location {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  color: #666;
-  font-size: 0.95rem;
-  font-weight: 500;
+  gap: 6px;
+  color: #6b7280;
+  font-size: 14px;
 }
 
-.property-meta svg {
-  color: #000000;
+.property-location svg {
   flex-shrink: 0;
+  color: #3b82f6;
 }
 
-/* Property Info Grid */
-.property-info-grid {
+/* Info Block */
+.info-block {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin-top: 0.5rem;
+  gap: 12px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
 }
 
-.info-item {
+.info-row {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 12px;
-  border: 1px solid #e9ecef;
-  transition: all 0.3s ease;
+  gap: 10px;
 }
 
-.info-item:hover {
-  background: #f1f3f4;
-  border-color: #d0d7de;
-}
-
-.info-item svg,
 .info-icon {
-  color: #667eea;
-  flex-shrink: 0;
-  font-size: 1.5rem;
-}
-
-.info-item > div {
+  width: 32px;
+  height: 32px;
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  flex: 1;
-  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 8px;
+  color: #3b82f6;
+  flex-shrink: 0;
+  font-size: 16px;
 }
 
 .info-label {
-  font-size: 0.8rem;
-  color: #666;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0;
 }
 
 .info-value {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #1a1a1a;
-  word-break: break-word;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 2px 0 0 0;
 }
 
-.info-value.success {
-  color: #28a745;
+.info-value.green {
+  color: #10b981;
 }
 
-/* Authorization Info */
-.authorization-info {
+/* Auth Date */
+.auth-date {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding-top: 1rem;
+  gap: 6px;
+  font-size: 12px;
+  color: #9ca3af;
   margin-top: auto;
-  border-top: 1px solid #e9ecef;
-  color: #666;
-  font-size: 0.9rem;
-  font-weight: 500;
+  padding-top: 8px;
+  border-top: 1px solid #e5e7eb;
 }
 
-.authorization-info svg {
-  color: #000000;
-  flex-shrink: 0;
-}
-
-/* Property Actions */
+/* Actions */
 .property-actions {
   display: flex;
-  gap: 1rem;
-  padding: 1.25rem 1.75rem;
-  background: #f8f9fa;
-  border-top: 2px solid #e9ecef;
+  gap: 8px;
+  padding: 0 20px 20px;
 }
 
-.btn-share-prop {
+.btn-share {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  background: #000000;
+  gap: 8px;
+  padding: 12px 20px;
+  background: black;
   color: white;
-  border: 2px solid #000000;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
+  transition: all 0.2s;
 }
 
-.btn-share-prop::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  transition: left 0.4s ease;
-  z-index: -1;
+.btn-share:hover {
+  background: rgb(39, 31, 31);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
-.btn-share-prop:hover::before {
-  left: 0;
-}
-
-.btn-share-prop:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-  border-color: transparent;
-}
-
-.btn-share-prop svg {
-  transition: transform 0.3s ease;
-}
-
-.btn-share-prop:hover svg {
-  transform: scale(1.1);
-}
-
-.btn-download-prop {
+.btn-download {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 50px;
-  height: 50px;
+  width: 44px;
+  height: 44px;
   background: white;
-  color: #1a1a1a;
-  border: 2px solid #e0e0e0;
-  border-radius: 12px;
+  color: #3b82f6;
+  border: 2px solid #3b82f6;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  flex-shrink: 0;
+  transition: all 0.2s;
 }
 
-.btn-download-prop:hover {
-  border-color: #000000;
-  background: #f8f9fa;
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+.btn-download:hover {
+  background: #3b82f6;
+  color: white;
+  transform: translateY(-1px);
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .property-details {
-    padding: 1.5rem;
-  }
-  
-  .property-title {
-    font-size: 1.2rem;
-  }
-  
-  .property-actions {
-    padding: 1rem 1.5rem;
-  }
-}
-
+/* Responsive */
 @media (max-width: 768px) {
-  .cp-property-card {
-    border-radius: 12px;
-  }
-  
-  .property-image {
+  .property-image-wrapper {
     height: 180px;
   }
-  
-  .property-details {
-    padding: 1.25rem;
+
+  .property-content {
+    padding: 16px;
   }
-  
+
   .property-title {
-    font-size: 1.15rem;
+    font-size: 16px;
   }
-  
-  .info-item {
-    padding: 0.875rem;
-    gap: 0.875rem;
-  }
-  
-  .info-value {
-    font-size: 1rem;
-  }
-  
+
   .property-actions {
-    padding: 1rem;
-    gap: 0.75rem;
-  }
-  
-  .btn-share-prop {
-    padding: 0.875rem 1rem;
-    font-size: 0.95rem;
-  }
-  
-  .btn-download-prop {
-    width: 45px;
-    height: 45px;
-  }
-}
-
-@media (max-width: 480px) {
-  .property-image {
-    height: 160px;
-  }
-  
-  .property-details {
-    padding: 1rem;
-  }
-  
-  .property-title {
-    font-size: 1.1rem;
-  }
-  
-  .property-meta {
-    font-size: 0.9rem;
-  }
-  
-  .info-item {
-    padding: 0.75rem;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-  
-  .info-item svg,
-  .info-icon {
-    font-size: 1.25rem;
-  }
-  
-  .property-actions {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  
-  .btn-share-prop {
-    width: 100%;
-  }
-  
-  .btn-download-prop {
-    width: 100%;
-    height: 45px;
-  }
-}
-
-/* Loading States */
-.cp-property-card.loading {
-  opacity: 0.7;
-  pointer-events: none;
-}
-
-.cp-property-card.loading::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 32px;
-  height: 32px;
-  margin: -16px 0 0 -16px;
-  border: 3px solid #e0e0e0;
-  border-top-color: #000000;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  z-index: 10;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Focus States for Accessibility */
-.btn-share-prop:focus,
-.btn-download-prop:focus {
-  outline: 2px solid #667eea;
-  outline-offset: 2px;
-}
-
-/* Print Styles */
-@media print {
-  .cp-property-card {
-    break-inside: avoid;
-    box-shadow: none;
-    border: 1px solid #000;
-  }
-  
-  .property-actions {
-    display: none;
+    padding: 0 16px 16px;
   }
 }

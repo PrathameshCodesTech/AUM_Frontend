@@ -272,12 +272,21 @@ const adminService = {
     return response.data;
   },
 
-  getInvestmentsByCustomer: async (customerId) => {
-    const response = await api.get(
-      `/admin/investments/by-customer/${customerId}/`
-    );
-    return response.data;
-  },
+getInvestmentsByCustomer: async (customerId) => {
+  const response = await api.get(
+    `/admin/investments/by-customer/${customerId}/`
+  );
+  
+  // Backend returns: { success, customer, total_investments, data: [...] }
+  // Normalize to: { success: true, data: [...] }
+  return {
+    success: true,
+    data: response.data.data || response.data.results || [],
+    total_investments: response.data.total_investments || 0,
+    total_amount: response.data.total_amount || 0,
+  };
+},
+
 
   // ========================================
   // CP APPLICATION MANAGEMENT

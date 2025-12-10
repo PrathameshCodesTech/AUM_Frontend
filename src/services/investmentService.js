@@ -2,7 +2,8 @@ import api from './api';
 
 const investmentService = {
   // Create new investment
-// Create new investment
+
+//! LEGACY: Simple investment without payment proof (kept for compatibility)
 createInvestment: async (propertyId, amount, unitsCount, referralCode) => {
   try {
     const payload = {
@@ -24,6 +25,23 @@ createInvestment: async (propertyId, amount, unitsCount, referralCode) => {
     throw error.response?.data || { error: 'Failed to create investment' };
   }
 },
+
+createInvestmentWithPayment: async (formData) => {
+    try {
+      console.log('📤 Sending investment with payment (FormData)');
+      
+      const response = await api.post('/wallet/investments/create/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      return response.data;
+    } catch (error) {
+      console.error('❌ Investment API error:', error.response?.data);
+      throw error.response?.data || { error: 'Failed to create investment' };
+    }
+  },
 
   // Get user's investments
   getMyInvestments: async () => {

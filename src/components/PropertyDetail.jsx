@@ -3,8 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 import propertyService from '../services/propertyService';
-import walletService from '../services/walletService';  // ← ADD THIS
-import investmentService from '../services/investmentService';  // ← ADD THIS
+import investmentService from '../services/investmentService';
 import '../styles/PropertyDetail.css';
 
 const PropertyDetail = () => {
@@ -17,22 +16,39 @@ const PropertyDetail = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [investmentAmount, setInvestmentAmount] = useState('');
-  const [unitsCount, setUnitsCount] = useState(1);  // ← ADD THIS
-  const [walletBalance, setWalletBalance] = useState(0);  // ← ADD THIS
+  const [unitsCount, setUnitsCount] = useState(1);
   const [showInterestModal, setShowInterestModal] = useState(false);
-  const [showInvestModal, setShowInvestModal] = useState(false);  // ← ADD THIS
-  const [investing, setInvesting] = useState(false);  // ← ADD THIS
+  const [showInvestModal, setShowInvestModal] = useState(false);
+  const [investing, setInvesting] = useState(false);
   const [expectedEarnings, setExpectedEarnings] = useState(null);
   const [earningsAmount, setEarningsAmount] = useState(500000);
   const [loadingEarnings, setLoadingEarnings] = useState(false);
 
   const [referralCode, setReferralCode] = useState('');
   const [validatingCode, setValidatingCode] = useState(false);
-  const [codeValidation, setCodeValidation] = useState(null); // { valid: true/false, message: '', cp_name: '' }
-  const [userCPRelation, setUserCPRelation] = useState(null); // ← NEW
-  const [checkingCPRelation, setCheckingCPRelation] = useState(true); // ← NEW
+  const [codeValidation, setCodeValidation] = useState(null);
+  const [userCPRelation, setUserCPRelation] = useState(null);
+  const [checkingCPRelation, setCheckingCPRelation] = useState(true);
 
-  // ✅ Check if user has CP relation
+  // 🆕 PAYMENT STATE VARIABLES
+  const [paymentMethod, setPaymentMethod] = useState('ONLINE');
+  const [paymentMode, setPaymentMode] = useState('UPI');
+  const [transactionNo, setTransactionNo] = useState('');
+  const [posSlipImage, setPosSlipImage] = useState(null);
+  const [posSlipPreview, setPosSlipPreview] = useState(null);
+  
+  const [chequeNumber, setChequeNumber] = useState('');
+  const [chequeDate, setChequeDate] = useState('');
+  const [bankName, setBankName] = useState('');
+  const [ifscCode, setIfscCode] = useState('');
+  const [branchName, setBranchName] = useState('');
+  const [chequeImage, setChequeImage] = useState(null);
+  const [chequeImagePreview, setChequeImagePreview] = useState(null);
+  
+  const [neftRtgsRefNo, setNeftRtgsRefNo] = useState('');
+  const [paymentNotes, setPaymentNotes] = useState('');
+
+  // Check if user has CP relation
   useEffect(() => {
     if (isAuthenticated) {
       checkUserCPRelation();
@@ -73,19 +89,6 @@ const PropertyDetail = () => {
         setInvestmentAmount(pricePerUnit * 1);
         setUnitsCount(1);
       }
-
-      // Fetch wallet balance if authenticated
-      if (isAuthenticated) {
-        try {
-          const balanceResponse = await walletService.getBalance();
-          if (balanceResponse.success) {
-            setWalletBalance(balanceResponse.data.balance);
-          }
-        } catch (error) {
-          // Wallet doesn't exist yet
-          setWalletBalance(0);
-        }
-      }
     } catch (error) {
       toast.error('Failed to load property details');
       console.error('Error:', error);
@@ -121,47 +124,111 @@ const PropertyDetail = () => {
     setShowInvestModal(true);
   };
 
+  // 🆕 HANDLE FILE UPLOADS
+  const handlePosSlipChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setPosSlipImage(file);
+      setPosSlipPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleChequeImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setChequeImage(file);
+      setChequeImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  // 🆕 UPDATED INVESTMENT SUBMIT WITH PAYMENT
   const handleInvestmentSubmit = async () => {
-  if (!investmentAmount || parseFloat(investmentAmount) < parseFloat(property.minimum_investment)) {
-    toast.error(`Minimum investment is ${formatCurrency(property.minimum_investment)}`);
-    return;
-  }
+    // Validate minimum investment
+    if (!investmentAmount || parseFloat(investmentAmount) < parseFloat(property.minimum_investment)) {
+      toast.error(`Minimum investment is ${formatCurrency(property.minimum_investment)}`);
+      return;
+    }
 
-  if (parseFloat(investmentAmount) > walletBalance) {
-    toast.error('Insufficient wallet balance. Please add funds first.');
-    navigate('/wallet');
-    return;
-  }
+    // 🆕 VALIDATE PAYMENT METHOD FIELDS
+    if (paymentMethod === 'ONLINE' || paymentMethod === 'POS') {
+      if (!transactionNo.trim()) {
+        toast.error('Transaction number is required');
+        return;
+      }
+    }
 
-  setInvesting(true);
-  try {
-    // ✅ Only send referral_code if it has a value
-    const referralCodeToSend = referralCode.trim() || undefined; // ← CHANGED: null → undefined
+    if (paymentMethod === 'DRAFT_CHEQUE') {
+      if (!chequeNumber.trim() || !chequeDate || !bankName.trim() || !ifscCode.trim() || !branchName.trim()) {
+        toast.error('Please fill all cheque details');
+        return;
+      }
+    }
 
-    console.log('🔍 Sending to backend:', {
-      property_id: property.id,
-      amount: investmentAmount,
-      units_count: unitsCount,
-      referral_code: referralCodeToSend || '(not provided)'
-    });
+    if (paymentMethod === 'NEFT_RTGS') {
+      if (!neftRtgsRefNo.trim()) {
+        toast.error('NEFT/RTGS reference number is required');
+        return;
+      }
+    }
 
-    const response = await investmentService.createInvestment(
-      property.id,
-      investmentAmount,
-      unitsCount,
-      referralCodeToSend  // ← CHANGED: Pass undefined instead of null
-    );
-      if (response.success) {
-        toast.success(response.message);
-        setShowInvestModal(false);
+    setInvesting(true);
+    try {
+      // 🆕 CREATE FORMDATA FOR FILE UPLOADS
+      const formData = new FormData();
+      formData.append('property_id', property.id);
+      formData.append('amount', investmentAmount);
+      formData.append('units_count', unitsCount);
+      
+      // Payment details
+      formData.append('payment_method', paymentMethod);
+      formData.append('payment_date', new Date().toISOString());
+      formData.append('payment_notes', paymentNotes);
 
-        // Refresh wallet balance
-        const balanceResponse = await walletService.getBalance();
-        if (balanceResponse.success) {
-          setWalletBalance(balanceResponse.data.balance);
+      // Add method-specific fields
+      if (paymentMethod === 'ONLINE' || paymentMethod === 'POS') {
+        formData.append('payment_mode', paymentMode);
+        formData.append('transaction_no', transactionNo);
+        if (posSlipImage) {
+          formData.append('pos_slip_image', posSlipImage);
         }
       }
+
+      if (paymentMethod === 'DRAFT_CHEQUE') {
+        formData.append('cheque_number', chequeNumber);
+        formData.append('cheque_date', chequeDate);
+        formData.append('bank_name', bankName);
+        formData.append('ifsc_code', ifscCode);
+        formData.append('branch_name', branchName);
+        if (chequeImage) {
+          formData.append('cheque_image', chequeImage);
+        }
+      }
+
+      if (paymentMethod === 'NEFT_RTGS') {
+        formData.append('neft_rtgs_ref_no', neftRtgsRefNo);
+      }
+
+      // ✅ KEEP: Referral code logic (unchanged)
+      const referralCodeToSend = referralCode.trim() || undefined;
+      if (referralCodeToSend) {
+        formData.append('referral_code', referralCodeToSend);
+      }
+
+      console.log('🔍 Submitting investment with payment...');
+
+      const response = await investmentService.createInvestmentWithPayment(formData);
+      
+      if (response.success) {
+        toast.success(response.message || 'Investment submitted successfully! Waiting for payment approval.');
+        setShowInvestModal(false);
+        
+        // Redirect to dashboard
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1500);
+      }
     } catch (error) {
+      console.error('Investment error:', error);
       toast.error(error.message || 'Failed to create investment');
     } finally {
       setInvesting(false);
@@ -182,14 +249,12 @@ const PropertyDetail = () => {
     const amount = parseFloat(newAmount);
     if (isNaN(amount) || amount < parseFloat(property.minimum_investment)) return;
 
-    // Calculate units based on amount, but ensure it's a valid multiple
     const calculatedUnits = Math.floor(amount / parseFloat(property.price_per_unit));
     if (calculatedUnits < 1) return;
 
     setUnitsCount(calculatedUnits);
     setInvestmentAmount(calculatedUnits * parseFloat(property.price_per_unit));
   };
-
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-IN', {
@@ -225,7 +290,6 @@ const PropertyDetail = () => {
     );
   }
 
-  // Use all_images if available (from deep=true), otherwise fallback
   const allImages = property.all_images?.map(img => img.url) || [
     property.primary_image || property.featured_image,
     ...(property.images?.map(img => img.image_url) || [])
@@ -256,12 +320,12 @@ const PropertyDetail = () => {
 
     setValidatingCode(true);
     try {
-      const response = await investmentService.validateCPCode(code); // or cpService.validateCode(code)
+      const response = await investmentService.validateCPCode(code);
       if (response.success) {
         setCodeValidation({
           valid: true,
           message: response.message,
-          cp_name: response.data.cp_name, // Channel Partner name
+          cp_name: response.data.cp_name,
           cp_id: response.data.cp_id
         });
       }
@@ -391,7 +455,7 @@ const PropertyDetail = () => {
               </button>
             </div>
 
-            {/* Tab Content */}
+            {/* Tab Content - KEEPING EXISTING TABS */}
             <div className="tab-content">
               {activeTab === 'overview' && (
                 <div className="overview-section">
@@ -578,7 +642,6 @@ const PropertyDetail = () => {
                   <h3>Expected Earnings</h3>
                   <p className="earnings-subtitle">Estimate your return on investment</p>
 
-                  {/* Calculator Input */}
                   <div className="earnings-calculator">
                     <label>Investment Amount</label>
                     <div className="amount-input-wrapper">
@@ -604,9 +667,6 @@ const PropertyDetail = () => {
                     </p>
                   </div>
 
-
-
-                  {/* Quick Amount Buttons */}
                   <div className="quick-amounts">
                     {[500000, 1000000, 2000000, 5000000].map(amount => (
                       <button
@@ -622,7 +682,6 @@ const PropertyDetail = () => {
                     ))}
                   </div>
 
-                  {/* Expected Earnings Table */}
                   {loadingEarnings ? (
                     <div className="loading-earnings">
                       <div className="spinner"></div>
@@ -801,34 +860,19 @@ const PropertyDetail = () => {
         </div>
       )}
 
-      {/* Investment Modal */}
+      {/* 🆕 INVESTMENT MODAL WITH PAYMENT FIELDS */}
       {showInvestModal && (
         <div className="modal-overlay" onClick={() => setShowInvestModal(false)}>
-          <div className="modal-content invest-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content invest-modal payment-modal" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close" onClick={() => setShowInvestModal(false)}>
               ×
             </button>
 
             <h2>Invest in {property.name}</h2>
-            <p className="modal-subtitle">Review your investment details</p>
-
-            <div className="wallet-info">
-              <div className="wallet-balance-box">
-                <span className="label">Wallet Balance</span>
-                <span className="value">{formatCurrency(walletBalance)}</span>
-              </div>
-              {walletBalance < parseFloat(property.minimum_investment) && (
-                <div className="warning-box">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                    <path d="M12 8V12M12 16H12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                  </svg>
-                  <span>Insufficient balance. <a href="/wallet">Add funds</a></span>
-                </div>
-              )}
-            </div>
+            <p className="modal-subtitle">Review your investment details and payment information</p>
 
             <div className="invest-inputs">
+              {/* SHARES INPUT */}
               <div className="input-group">
                 <label>Number of Shares</label>
                 <div className="unit-selector">
@@ -855,6 +899,7 @@ const PropertyDetail = () => {
                 <span className="input-hint">{property.available_units} Shares available</span>
               </div>
 
+              {/* AMOUNT INPUT */}
               <div className="input-group">
                 <label>Investment Amount (₹)</label>
                 <input
@@ -867,10 +912,255 @@ const PropertyDetail = () => {
                 <span className="input-hint">Min: {formatCurrency(property.minimum_investment)}</span>
               </div>
 
-              {/* ✅ CONDITIONAL: Only show if user does NOT have CP relation */}
+              {/* 🆕 PAYMENT METHOD SELECTION */}
+              <div className="input-group">
+                <label>Payment Method <span className="required">*</span></label>
+                <div className="payment-methods">
+                  <button
+                    type="button"
+                    className={`payment-method-btn ${paymentMethod === 'ONLINE' ? 'active' : ''}`}
+                    onClick={() => setPaymentMethod('ONLINE')}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                      <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="2" />
+                      <path d="M2 10H22" stroke="currentColor" strokeWidth="2" />
+                    </svg>
+                    <span>Online</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`payment-method-btn ${paymentMethod === 'POS' ? 'active' : ''}`}
+                    onClick={() => setPaymentMethod('POS')}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                      <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="2" />
+                      <path d="M9 9H15M9 13H12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                    <span>POS</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`payment-method-btn ${paymentMethod === 'DRAFT_CHEQUE' ? 'active' : ''}`}
+                    onClick={() => setPaymentMethod('DRAFT_CHEQUE')}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                      <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2" />
+                      <path d="M14 2V8H20" stroke="currentColor" strokeWidth="2" />
+                    </svg>
+                    <span>Cheque</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`payment-method-btn ${paymentMethod === 'NEFT_RTGS' ? 'active' : ''}`}
+                    onClick={() => setPaymentMethod('NEFT_RTGS')}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span>NEFT/RTGS</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* 🆕 CONDITIONAL FIELDS BASED ON PAYMENT METHOD */}
+              {(paymentMethod === 'ONLINE' || paymentMethod === 'POS') && (
+                <div className="payment-details-section">
+                  <div className="section-header">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" />
+                      <path d="M2 17L12 22L22 17M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" />
+                    </svg>
+                    <h4>{paymentMethod === 'ONLINE' ? 'Online Payment Details' : 'POS Transaction Details'}</h4>
+                  </div>
+
+                  <div className="input-group">
+                    <label>Payment Mode <span className="required">*</span></label>
+                    <select 
+                      value={paymentMode} 
+                      onChange={(e) => setPaymentMode(e.target.value)}
+                      className="payment-select"
+                    >
+                      <option value="UPI">UPI</option>
+                      <option value="Card">Debit/Credit Card</option>
+                      <option value="NetBanking">Net Banking</option>
+                      <option value="Wallet">Digital Wallet</option>
+                    </select>
+                  </div>
+
+                  <div className="input-group">
+                    <label>Transaction Number <span className="required">*</span></label>
+                    <input
+                      type="text"
+                      value={transactionNo}
+                      onChange={(e) => setTransactionNo(e.target.value)}
+                      placeholder="Enter transaction/reference number"
+                      maxLength={50}
+                    />
+                  </div>
+
+                  <div className="input-group">
+                    <label>Upload {paymentMethod === 'POS' ? 'POS' : 'Payment'} Slip (Optional)</label>
+                    <div className="file-upload-wrapper">
+                      <input
+                        type="file"
+                        id="pos-slip"
+                        accept="image/*"
+                        onChange={handlePosSlipChange}
+                        className="file-input"
+                      />
+                      <label htmlFor="pos-slip" className="file-upload-label">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                          <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          <polyline points="17 8 12 3 7 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        <span>{posSlipImage ? posSlipImage.name : 'Choose File'}</span>
+                      </label>
+                    </div>
+                    {posSlipPreview && (
+                      <div className="image-preview">
+                        <img src={posSlipPreview} alt="POS Slip" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {paymentMethod === 'DRAFT_CHEQUE' && (
+                <div className="payment-details-section">
+                  <div className="section-header">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                      <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2" />
+                    </svg>
+                    <h4>Cheque/Draft Details</h4>
+                  </div>
+
+                  <div className="input-row">
+                    <div className="input-group">
+                      <label>Cheque Number <span className="required">*</span></label>
+                      <input
+                        type="text"
+                        value={chequeNumber}
+                        onChange={(e) => setChequeNumber(e.target.value)}
+                        placeholder="Enter cheque number"
+                        maxLength={20}
+                      />
+                    </div>
+
+                    <div className="input-group">
+                      <label>Cheque Date <span className="required">*</span></label>
+                      <input
+                        type="date"
+                        value={chequeDate}
+                        onChange={(e) => setChequeDate(e.target.value)}
+                        max={new Date().toISOString().split('T')[0]}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="input-group">
+                    <label>Bank Name <span className="required">*</span></label>
+                    <input
+                      type="text"
+                      value={bankName}
+                      onChange={(e) => setBankName(e.target.value)}
+                      placeholder="Enter bank name"
+                      maxLength={100}
+                    />
+                  </div>
+
+                  <div className="input-row">
+                    <div className="input-group">
+                      <label>IFSC Code <span className="required">*</span></label>
+                      <input
+                        type="text"
+                        value={ifscCode}
+                        onChange={(e) => setIfscCode(e.target.value.toUpperCase())}
+                        placeholder="e.g., HDFC0001234"
+                        maxLength={11}
+                      />
+                    </div>
+
+                    <div className="input-group">
+                      <label>Branch Name <span className="required">*</span></label>
+                      <input
+                        type="text"
+                        value={branchName}
+                        onChange={(e) => setBranchName(e.target.value)}
+                        placeholder="Enter branch name"
+                        maxLength={100}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="input-group">
+                    <label>Upload Cheque Image (Optional)</label>
+                    <div className="file-upload-wrapper">
+                      <input
+                        type="file"
+                        id="cheque-image"
+                        accept="image/*"
+                        onChange={handleChequeImageChange}
+                        className="file-input"
+                      />
+                      <label htmlFor="cheque-image" className="file-upload-label">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                          <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          <polyline points="17 8 12 3 7 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        <span>{chequeImage ? chequeImage.name : 'Choose File'}</span>
+                      </label>
+                    </div>
+                    {chequeImagePreview && (
+                      <div className="image-preview">
+                        <img src={chequeImagePreview} alt="Cheque" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {paymentMethod === 'NEFT_RTGS' && (
+                <div className="payment-details-section">
+                  <div className="section-header">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" />
+                      <path d="M2 17L12 22L22 17M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" />
+                    </svg>
+                    <h4>NEFT/RTGS Details</h4>
+                  </div>
+
+                  <div className="input-group">
+                    <label>NEFT/RTGS Reference Number <span className="required">*</span></label>
+                    <input
+                      type="text"
+                      value={neftRtgsRefNo}
+                      onChange={(e) => setNeftRtgsRefNo(e.target.value)}
+                      placeholder="Enter transaction reference number"
+                      maxLength={50}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* PAYMENT NOTES */}
+              <div className="input-group">
+                <label>Payment Notes (Optional)</label>
+                <textarea
+                  value={paymentNotes}
+                  onChange={(e) => setPaymentNotes(e.target.value)}
+                  placeholder="Add any additional notes about this payment..."
+                  rows="3"
+                  maxLength={500}
+                />
+              </div>
+
+              {/* ✅ REFERRAL CODE SECTION - UNCHANGED */}
               {!checkingCPRelation && (
                 userCPRelation ? (
-                  // User already has CP - show info message
                   <div className="input-group">
                     <label>Referred by</label>
                     <div className="cp-linked-message">
@@ -883,7 +1173,6 @@ const PropertyDetail = () => {
                     </div>
                   </div>
                 ) : (
-                  // User does NOT have CP - show input field
                   <div className="input-group">
                     <label>Referred by (Optional)</label>
                     <div className="referral-input-wrapper">
@@ -918,6 +1207,7 @@ const PropertyDetail = () => {
               )}
             </div>
 
+            {/* INVESTMENT SUMMARY */}
             <div className="invest-summary">
               <div className="summary-row">
                 <span>Price per unit</span>
@@ -926,6 +1216,10 @@ const PropertyDetail = () => {
               <div className="summary-row">
                 <span>Shares</span>
                 <strong>{unitsCount}</strong>
+              </div>
+              <div className="summary-row">
+                <span>Payment Method</span>
+                <strong>{paymentMethod === 'DRAFT_CHEQUE' ? 'Cheque/Draft' : paymentMethod}</strong>
               </div>
               <div className="summary-row total">
                 <span>Total Investment</span>
@@ -944,9 +1238,9 @@ const PropertyDetail = () => {
               <button
                 className="btn-confirm"
                 onClick={handleInvestmentSubmit}
-                disabled={investing || walletBalance < parseFloat(investmentAmount)}
+                disabled={investing}
               >
-                {investing ? 'Processing...' : 'Confirm Investment'}
+                {investing ? 'Processing...' : 'Submit Investment'}
               </button>
             </div>
           </div>

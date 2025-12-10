@@ -150,3 +150,167 @@
     justify-content: center;
   }
 }
+.payment-proof-link {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #e7f3ff;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.payment-proof-link:hover {
+  background: #cce5ff;
+  text-decoration: underline;
+}
+
+/* Payment Method Cell */
+.payment-method-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.payment-method-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+}
+
+.payment-method-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Status Cell */
+.status-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Text Muted */
+.text-muted {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 14px;
+}
+
+/* Stat Icons Colors */
+.stat-icon-warning {
+  color: #f59e0b !important;
+}
+
+.stat-icon-success {
+  color: #10b981 !important;
+}
+
+/* Payment Section Highlight */
+.payment-section-highlight {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  border-radius: 16px;
+  padding: 24px !important;
+}
+
+/* Payment Proof Section */
+.payment-proof-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.payment-proof-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Transaction Code Styling */
+.transaction-code {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #667eea !important;
+  background: rgba(102, 126, 234, 0.1);
+  padding: 4px 12px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+/* Status Yes/No */
+.status-yes {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #10b981;
+  font-weight: 600;
+}
+
+.status-no {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 500;
+}
+
+/* Warning Sections */
+.warning-section {
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 24px;
+}
+
+.warning-section h4 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.warning-section p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.warning-section.rejected {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.warning-section.cancelled {
+  background: rgba(156, 163, 175, 0.1);
+  border: 1px solid rgba(156, 163, 175, 0.3);
+  color: #9ca3af;
+}
+
+/* Commission List */
+.commissions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.commission-item {
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+}

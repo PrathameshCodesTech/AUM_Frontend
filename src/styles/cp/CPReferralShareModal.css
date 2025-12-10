@@ -50,33 +50,42 @@
 }
 
 /* Modal Header */
+/* AFTER: */
 .modal-header-share {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
   border-bottom: 2px solid #f0f0f0;
+  gap: 1rem;  /* NEW */
 }
 
+/* AFTER: */
 .modal-header-share h2 {
   font-size: 1.5rem;
   font-weight: 700;
   color: #1a1a1a;
   margin: 0;
+  flex: 1;  /* NEW */
 }
 
+/* AFTER: */
 .btn-close-modal {
-  width: 40px;
-  height: 40px;
+  width: 32px;             /* increased */
+  height: 32px;            /* increased */
+  min-width: 32px;         /* NEW */
+  min-height: 32px;        /* NEW */
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #f8f9fa;
   border: 2px solid #e0e0e0;
-  border-radius: 8px;
+  border-radius: 8px;      /* increased */
   cursor: pointer;
   transition: all 0.3s ease;
   color: #666;
+  flex-shrink: 0;          /* NEW */
 }
 
 .btn-close-modal:hover {
